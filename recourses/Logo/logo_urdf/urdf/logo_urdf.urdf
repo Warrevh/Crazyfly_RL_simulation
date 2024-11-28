@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="logo_urdf">
+  <link
+    name="L_logo">
+    <inertial>
+      <origin
+        xyz="0.3065 0.75 -0.992"
+        rpy="0 0 0" />
+      <mass
+        value="1824.288" />
+      <inertia
+        ixx="940.459382144"
+        ixy="9.2034491139259E-15"
+        ixz="-9.46667337113164E-14"
+        iyy="655.5312886"
+        iyz="0"
+        izz="399.179906456" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/L_logo.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.9607843137254902 0.9411764705882353 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/L_logo.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Base_logo">
+    <inertial>
+      <origin
+        xyz="1.59816863108292 0.738976237325327 -0.743198804251725"
+        rpy="0 0 0" />
+      <mass
+        value="6113.33915549822" />
+      <inertia
+        ixx="2620.3510164548"
+        ixy="-13.0852970044327"
+        ixz="-687.554411864084"
+        iyy="8971.78912525507"
+        iyz="39.9768538161322"
+        izz="8718.83473556337" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/Base_logo.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.9607843137254902 0.9411764705882353 0" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/Base_logo.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_logo"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="L_logo" />
+    <child
+      link="Base_logo" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="I_logo">
+    <inertial>
+      <origin
+        xyz="1.0695 0.75 -0.685"
+        rpy="0 0 0" />
+      <mass
+        value="1259.715" />
+      <inertia
+        ixx="433.226486125"
+        ixy="-4.58658492846533E-31"
+        ixz="-5.55111512312578E-15"
+        iyy="236.47674411125"
+        iyz="0"
+        izz="275.64338298625" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/I_logo.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.9607843137254902 0.9411764705882353 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/I_logo.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="i_logo"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="L_logo" />
+    <child
+      link="I_logo" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Dot_logo">
+    <inertial>
+      <origin
+        xyz="-0.621263013570749 0.75 -1.6891383211475"
+        rpy="0 0 0" />
+      <mass
+        value="510.073695625819" />
+      <inertia
+        ixx="109.4415396519"
+        ixy="1.97831282738914E-31"
+        ixz="0"
+        iyy="27.6054434441171"
+        iyz="-2.2201637408111E-31"
+        izz="109.4415396519" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/Dot_logo.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.9607843137254902 0.9411764705882353 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/Dot_logo.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="dot_logo"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 -1.77489823356395" />
+    <parent
+      link="L_logo" />
+    <child
+      link="Dot_logo" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="U_logo">
+    <inertial>
+      <origin
+        xyz="2.80799597517163 0.75 -0.707390713926031"
+        rpy="0 0 0" />
+      <mass
+        value="2435.0224598724" />
+      <inertia
+        ixx="817.238672131539"
+        ixy="0.000115381507157211"
+        ixz="0.00110773544684508"
+        iyy="750.205632880394"
+        iyz="-5.11244815823484E-14"
+        izz="846.103053480615" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/U_logo.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.8 0.9607843137254902 0.9411764705882353 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://logo_urdf/meshes/U_logo.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="u_logo"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="L_logo" />
+    <child
+      link="U_logo" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

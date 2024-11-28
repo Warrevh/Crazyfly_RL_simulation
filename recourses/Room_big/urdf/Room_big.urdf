@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="Room_big">
+  <link
+    name="wall_s1">
+    <inertial>
+      <origin
+        xyz="-0.1 1 2.1"
+        rpy="0 0 0" />
+      <mass
+        value="1680" />
+      <inertia
+        ixx="3029.6"
+        ixy="-9.40037234760435E-33"
+        ixz="1.22864681391851E-14"
+        iyy="2475.2"
+        iyz="0"
+        izz="565.6" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/wall_s1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/wall_s1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Wall_l2">
+    <inertial>
+      <origin
+        xyz="-0.1 -1 2.4"
+        rpy="0 0 0" />
+      <mass
+        value="2080" />
+      <inertia
+        ixx="5380.26666666667"
+        ixy="-4.74075063233781E-31"
+        ixz="-1.12502599828683E-14"
+        iyy="4693.86666666667"
+        iyz="0"
+        izz="700.266666666667" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/Wall_l2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/Wall_l2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="wall_l2"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="wall_s1" />
+    <child
+      link="Wall_l2" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Wall_s3">
+    <inertial>
+      <origin
+        xyz="5.1 1 1.9"
+        rpy="0 0 0" />
+      <mass
+        value="1679.99999999999" />
+      <inertia
+        ixx="3029.59999999999"
+        ixy="-2.21436088129666E-30"
+        ixz="1.47955721748378E-14"
+        iyy="2475.19999999999"
+        iyz="-5.9211894646675E-14"
+        izz="565.599999999998" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/Wall_s3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/Wall_s3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="wall_s3"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="wall_s1" />
+    <child
+      link="Wall_s3" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Wall_l4">
+    <inertial>
+      <origin
+        xyz="4.1 -1 2.6"
+        rpy="0 0 0" />
+      <mass
+        value="2080" />
+      <inertia
+        ixx="5380.26666666666"
+        ixy="-1.48029736616687E-15"
+        ixz="-2.51650552248367E-14"
+        iyy="4693.86666666666"
+        iyz="0"
+        izz="700.266666666666" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/Wall_l4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Room_big/meshes/Wall_l4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="wall_l4"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="wall_s1" />
+    <child
+      link="Wall_l4" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
