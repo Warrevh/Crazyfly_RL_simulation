@@ -16,6 +16,7 @@ from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckA
 from stable_baselines3.common.buffers import DictReplayBuffer
 
 from RLEnvironment import RLEnvironment
+from data_handling import Txt_File
 
 parameters = {
     #env parameters
@@ -50,7 +51,10 @@ filename = os.path.join(output_folder, 'save-'+datetime.now().strftime("%m.%d.%Y
 if not os.path.exists(filename):
     os.makedirs(filename+'/')
 
-train_env = make_vec_env(RLEnvironment(parameters=parameters),n_envs=1, seed=0)
+Myparameters = Txt_File(filename)
+Myparameters.save_parameters(parameters)
+
+train_env = make_vec_env(lambda: RLEnvironment(parameters=parameters),n_envs=1, seed=0)
 
 eval_env = RLEnvironment(parameters=parameters,gui = train_giu)
 

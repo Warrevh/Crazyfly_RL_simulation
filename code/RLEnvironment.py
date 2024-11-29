@@ -12,15 +12,15 @@ from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 class RLEnvironment(BaseRLAviary):
 
     def __init__(self, 
-                 drone_model = DroneModel.CF2X, 
-                 num_drones = 1, 
-                 neighbourhood_radius = np.inf, 
-                 initial_rpys=None, 
-                 physics = Physics.PYB, 
-                 pyb_freq = 240, 
-                 gui=False, 
-                 record=False, 
-                 obs = ObservationType.KIN, 
+                 drone_model = DroneModel.CF2X,
+                 num_drones = 1,
+                 neighbourhood_radius = np.inf,
+                 initial_rpys=None,
+                 physics = Physics.PYB,
+                 pyb_freq = 240,
+                 gui=False,
+                 record=False,
+                 obs = ObservationType.KIN,
                  act = ActionType.PID,
                  parameters = None
                  ):
@@ -388,5 +388,3 @@ class createWaypoint():
                       basePosition = pos,
                       physicsClientId=CLIENT)
         return body_id
-
-    
