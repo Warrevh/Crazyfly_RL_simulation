@@ -21,7 +21,7 @@ from data_handling import Txt_File
 parameters = {
     #env parameters
     'initial_xyzs': np.array([[4.5,3.5,0.2]]),
-    'ctrl_freq': 240,
+    'ctrl_freq': 120,
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 60,
     #Learning rate
@@ -29,13 +29,16 @@ parameters = {
     'Learning_rate_decay': -0.005,
     #Reward
     'Target_reward': -700,
+    #Reward Function
+    'Rew_distrav_factor': 0.1,
+    'Rew_disway_factor': 0.1,
     #evaluation callback
-    'eval_freq': 10, #"epsisodes" (eval_freq*(epsiode_length*ctrl_freq))
+    'eval_freq': 5, #"epsisodes" (eval_freq*(epsiode_length*ctrl_freq))
     #observation !!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'position': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
-    'velocity': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
-    'rpy': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
-    'ang_v': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
+    'velocity': False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
+    'rpy': False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
+    'ang_v': False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'prev_act':True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     #train
     'Total_timesteps': int(10e6),

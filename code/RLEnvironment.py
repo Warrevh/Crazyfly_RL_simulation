@@ -27,6 +27,8 @@ class RLEnvironment(BaseRLAviary):
         
         self.INITIAL_XYZS = parameters['initial_xyzs'] #np.array([[4.5,3.5,0.2]]) #np.array([[-1.5,-1.5,0.2]])
         self.CTRL_FREQ = parameters['ctrl_freq']
+        self.Rew_distrav_factor = parameters['Rew_distrav_factor']
+        self.Rew_disway_factor = parameters['Rew_disway_factor']
 
         self.act2d = True
 
@@ -82,7 +84,7 @@ class RLEnvironment(BaseRLAviary):
         prev_state = self.reward_state[0:2]
         self.reward_state = self._getDroneStateVector(0)[0:2]
 
-        ret = -0.1*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))-0.1*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #-1 each step
+        ret = -self.Rew_distrav_factor*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))-self.Rew_disway_factor*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #-1 each step
         #-0.01*(abs(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))) #negative reward for distance travelled
          #negative reward for distance to target
 
@@ -248,9 +250,9 @@ class RLEnvironment(BaseRLAviary):
 
             ret = spaces.Dict({
                 "Position": spaces.Box(low=pos_lo, high=pos_hi,dtype=np.float32),
-                "Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
-                "rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
-                "ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
+                #"Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
+                #"rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
+                #"ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
                 "prev_act": spaces.Box(low=act_lower_bound, high=act_upper_bound,dtype=np.float32)
             })
 
@@ -298,9 +300,9 @@ class RLEnvironment(BaseRLAviary):
                 act = np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])
             ret = {
                 "Position": np.array([pos[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                "Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                "rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                "ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                #"Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                #"rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                #"ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "prev_act": act.astype('float32')
             }
 
