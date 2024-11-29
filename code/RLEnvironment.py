@@ -15,34 +15,36 @@ class RLEnvironment(BaseRLAviary):
                  drone_model = DroneModel.CF2X, 
                  num_drones = 1, 
                  neighbourhood_radius = np.inf, 
-                 initial_xyzs=np.array([[4.5,3.5,0.2]]), #np.array([[-1.5,-1.5,0.2]])
                  initial_rpys=None, 
                  physics = Physics.PYB, 
                  pyb_freq = 240, 
-                 ctrl_freq = 240, 
                  gui=False, 
                  record=False, 
                  obs = ObservationType.KIN, 
-                 act = ActionType.PID
+                 act = ActionType.PID,
+                 parameters = None
                  ):
         
+        self.INITIAL_XYZS = parameters['initial_xyzs'] #np.array([[4.5,3.5,0.2]]) #np.array([[-1.5,-1.5,0.2]])
+        self.CTRL_FREQ = parameters['ctrl_freq']
+
         self.act2d = True
 
         self.waypoint = False
         self.smallWaypoints_POS = np.array([[1,0.5,0.2],[2,0.5,0.2]])
         self.smallWaypoint_RAD = 0.1 
 
-        self.TARGET_POS = np.array([2.5,2,0.2]) #np.array([0.15,2.5,0.2])
+        self.TARGET_POS = parameters['Target_pos'] #np.array([2.5,2,0.2]) #np.array([0.15,2.5,0.2])
         self.TARGET_RAD = 0.1
         
         super().__init__(drone_model, 
                          num_drones, 
                          neighbourhood_radius, 
-                         initial_xyzs, 
+                         self.INITIAL_XYZS, 
                          initial_rpys, 
                          physics, 
                          pyb_freq, 
-                         ctrl_freq, 
+                         self.CTRL_FREQ, 
                          gui, 
                          record, 
                          obs, 
@@ -50,8 +52,7 @@ class RLEnvironment(BaseRLAviary):
                          )
         
         
-        self.EPISODE_LEN_SEC = 60
-        self.CTRL_FREQ = ctrl_freq
+        self.EPISODE_LEN_SEC = parameters['episode_length']
         
         self.reward_state = self._getDroneStateVector(0)[0:2]
 

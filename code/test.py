@@ -8,9 +8,27 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 from RLEnvironment import RLEnvironment, getAction
 
+
+parameters = {
+    #env parameters
+    'initial_xyzs': np.array([[0.5,0.5,0.2]]),
+    'ctrl_freq': 60,
+    'Target_pos': np.array([4,0.5,0.2]),
+    'episode_length': 60,
+    #Learning rate
+    'Learning_rate': 0.0005,
+    'Learning_rate_decay': -0.005,
+    #Reward
+    'Target_reward': -700,
+    #evaluation callback
+    'eval_freq': 10,
+
+    'Total_timesteps': int(10e6),
+}
+
 seed = 42
 
-env = RLEnvironment(gui=True)
+env = RLEnvironment(parameters=parameters, gui=True)
 obs = env.reset
 
 
@@ -20,9 +38,9 @@ start = time.time()
 tot_reward = 0
 
 
-for i in range(100000):
+for i in range(10):
 
-    action = np.array([[1,0]]) #getAction._getActionSquare(i) #
+    action = np.array([[1,0]]) #getAction._getRandomAction()#np.array([[1,0]]) #getAction._getActionSquare(i)
 
     obs, reward, terminated, truncated, info = env.step(action)
     print("Obs:", obs, "\tAction", action, "\tReward:", reward, "\tTerminated:", terminated, "\tTruncated:", truncated)
