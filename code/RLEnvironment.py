@@ -30,6 +30,7 @@ class RLEnvironment(BaseRLAviary):
         self.Rew_distrav_fact = parameters['Rew_distrav_fact']
         self.Rew_disway_fact = parameters['Rew_disway_fact']
         self.Rew_step_fact = parameters['Rew_step_fact']
+        self.Rew_tardis_fact= parameters['Rew_tardis_fact']
 
         self.act2d = True
 
@@ -58,6 +59,7 @@ class RLEnvironment(BaseRLAviary):
         self.EPISODE_LEN_SEC = parameters['episode_length']
         
         self.reward_state = self._getDroneStateVector(0)[0:2]
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-self._getDroneStateVector(0)[0:2])
 
     def step(self,action):
 
@@ -85,9 +87,13 @@ class RLEnvironment(BaseRLAviary):
         prev_state = self.reward_state[0:2]
         self.reward_state = self._getDroneStateVector(0)[0:2]
 
+        prev_tar_dis = self.target_dis
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-self._getDroneStateVector(0)[0:2])
+
         ret = (-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2])) #negative reward for distance travelled
                -self.Rew_disway_fact*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #negative reward for distance to target
-               -self.Rew_step_fact*1) #-1 each step
+               -self.Rew_step_fact*1 #-1 each step
+               +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)) #positive if moved in direction of target
          
         if self._getCollision(self.DRONE_IDS[0]):
             ret = -100 #reward for hitting wall
@@ -255,7 +261,7 @@ class RLEnvironment(BaseRLAviary):
                 "Position": spaces.Box(low=pos_lo, high=pos_hi,dtype=np.float32),
                 "Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
                 #"rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
-                #"ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
+                "ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
                 #"prev_act": spaces.Box(low=act_lower_bound, high=act_upper_bound,dtype=np.float32)
             })
 
@@ -307,7 +313,7 @@ class RLEnvironment(BaseRLAviary):
                 "Position": np.array([pos[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 #"rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                #"ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                "ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 #"prev_act": act.astype('float32')
             }
 
