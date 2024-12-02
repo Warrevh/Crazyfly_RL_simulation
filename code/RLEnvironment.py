@@ -12,37 +12,43 @@ from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 class RLEnvironment(BaseRLAviary):
 
     def __init__(self, 
-                 drone_model = DroneModel.CF2X, 
-                 num_drones = 1, 
-                 neighbourhood_radius = np.inf, 
-                 initial_xyzs=np.array([[4.5,3.5,0.2]]), #np.array([[-1.5,-1.5,0.2]])
-                 initial_rpys=None, 
-                 physics = Physics.PYB, 
-                 pyb_freq = 240, 
-                 ctrl_freq = 240, 
-                 gui=False, 
-                 record=False, 
-                 obs = ObservationType.KIN, 
-                 act = ActionType.PID
+                 drone_model = DroneModel.CF2X,
+                 num_drones = 1,
+                 neighbourhood_radius = np.inf,
+                 initial_rpys=None,
+                 physics = Physics.PYB,
+                 pyb_freq = 240,
+                 gui=False,
+                 record=False,
+                 obs = ObservationType.KIN,
+                 act = ActionType.PID,
+                 parameters = None
                  ):
         
+        self.INITIAL_XYZS = parameters['initial_xyzs'] #np.array([[4.5,3.5,0.2]]) #np.array([[-1.5,-1.5,0.2]])
+        self.CTRL_FREQ = parameters['ctrl_freq']
+        self.Rew_distrav_fact = parameters['Rew_distrav_fact']
+        self.Rew_disway_fact = parameters['Rew_disway_fact']
+        self.Rew_step_fact = parameters['Rew_step_fact']
+        self.Rew_tardis_fact= parameters['Rew_tardis_fact']
+
         self.act2d = True
 
         self.waypoint = False
         self.smallWaypoints_POS = np.array([[1,0.5,0.2],[2,0.5,0.2]])
         self.smallWaypoint_RAD = 0.1 
 
-        self.TARGET_POS = np.array([2.5,2,0.2]) #np.array([0.15,2.5,0.2])
+        self.TARGET_POS = parameters['Target_pos'] #np.array([2.5,2,0.2]) #np.array([0.15,2.5,0.2])
         self.TARGET_RAD = 0.1
         
         super().__init__(drone_model, 
                          num_drones, 
                          neighbourhood_radius, 
-                         initial_xyzs, 
+                         self.INITIAL_XYZS, 
                          initial_rpys, 
                          physics, 
                          pyb_freq, 
-                         ctrl_freq, 
+                         self.CTRL_FREQ, 
                          gui, 
                          record, 
                          obs, 
@@ -50,10 +56,10 @@ class RLEnvironment(BaseRLAviary):
                          )
         
         
-        self.EPISODE_LEN_SEC = 60
-        self.CTRL_FREQ = ctrl_freq
+        self.EPISODE_LEN_SEC = parameters['episode_length']
         
         self.reward_state = self._getDroneStateVector(0)[0:2]
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-self._getDroneStateVector(0)[0:2])
 
     def step(self,action):
 
@@ -81,10 +87,14 @@ class RLEnvironment(BaseRLAviary):
         prev_state = self.reward_state[0:2]
         self.reward_state = self._getDroneStateVector(0)[0:2]
 
-        ret = -0.1*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))-0.1*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #-1 each step
-        #-0.01*(abs(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))) #negative reward for distance travelled
-         #negative reward for distance to target
+        prev_tar_dis = self.target_dis
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-self._getDroneStateVector(0)[0:2])
 
+        ret = (-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2])) #negative reward for distance travelled
+               -self.Rew_disway_fact*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #negative reward for distance to target
+               -self.Rew_step_fact*1 #-1 each step
+               +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)) #positive if moved in direction of target
+         
         if self._getCollision(self.DRONE_IDS[0]):
             ret = -100 #reward for hitting wall
         elif self._computeTerminated():
@@ -239,18 +249,20 @@ class RLEnvironment(BaseRLAviary):
 
             act_lo = -1
             act_hi = +1
+            act_lower_bound = np.empty((0, 2))
+            act_upper_bound = np.empty((0, 2))
             for i in range(self.ACTION_BUFFER_SIZE):
-                act_lower_bound = np.array([[act_lo,act_lo] for i in range(self.NUM_DRONES)])
-                act_upper_bound = np.array([[act_hi,act_hi] for i in range(self.NUM_DRONES)])
+                act_lower_bound = np.append(act_lower_bound,np.array([[act_lo,act_lo] for i in range(self.NUM_DRONES)]),axis=0)
+                act_upper_bound = np.append(act_upper_bound,np.array([[act_hi,act_hi] for i in range(self.NUM_DRONES)]),axis=0)
 
 
 
             ret = spaces.Dict({
                 "Position": spaces.Box(low=pos_lo, high=pos_hi,dtype=np.float32),
                 "Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
-                "rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
+                #"rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
                 "ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
-                "prev_act": spaces.Box(low=act_lower_bound, high=act_upper_bound,dtype=np.float32)
+                #"prev_act": spaces.Box(low=act_lower_bound, high=act_upper_bound,dtype=np.float32)
             })
 
             return ret
@@ -293,14 +305,16 @@ class RLEnvironment(BaseRLAviary):
                 rpy[i,:]=obs[7:10]
                 ang_v[i,:]=obs[13:16]
 
+            act = np.empty((0, 2))
             for i in range(self.ACTION_BUFFER_SIZE):
-                act = np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])
+                act = np.append(act,np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)]),axis=0)
+
             ret = {
                 "Position": np.array([pos[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                "rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                #"rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                "prev_act": act.astype('float32')
+                #"prev_act": act.astype('float32')
             }
 
             return ret
@@ -387,5 +401,3 @@ class createWaypoint():
                       basePosition = pos,
                       physicsClientId=CLIENT)
         return body_id
-
-    
