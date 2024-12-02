@@ -30,7 +30,7 @@ parameters = {
     #Reward
     'Target_reward': 100000,
     #Reward Function
-    'Rew_distrav_fact': 0.1,
+    'Rew_distrav_fact': 0,
     'Rew_disway_fact': 0.1,
     'Rew_step_fact': 0,
     'Rew_tardis_fact': 1,
@@ -50,7 +50,7 @@ parameters = {
 
 eval_freq = parameters['eval_freq']*parameters['ctrl_freq']*parameters['episode_length']
 
-train_giu = False
+train_giu = True
 
 output_folder= 'results'
 

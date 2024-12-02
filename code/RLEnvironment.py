@@ -260,7 +260,7 @@ class RLEnvironment(BaseRLAviary):
             ret = spaces.Dict({
                 "Position": spaces.Box(low=pos_lo, high=pos_hi,dtype=np.float32),
                 "Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
-                #"rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
+                "rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
                 "ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
                 #"prev_act": spaces.Box(low=act_lower_bound, high=act_upper_bound,dtype=np.float32)
             })
@@ -312,7 +312,7 @@ class RLEnvironment(BaseRLAviary):
             ret = {
                 "Position": np.array([pos[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                #"rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                "rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 #"prev_act": act.astype('float32')
             }
