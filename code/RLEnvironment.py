@@ -240,8 +240,8 @@ class RLEnvironment(BaseRLAviary):
 
             pos_lo = np.array([[-5,-5,0] for i in range(self.NUM_DRONES)])
             pos_hi = np.array([[5,5,3] for i in range(self.NUM_DRONES)])
-            vel_lo = np.array([[-50,-50,-50] for i in range(self.NUM_DRONES)])
-            vel_hi = np.array([[50,50,50] for i in range(self.NUM_DRONES)])
+            vel_lo = np.array([[-1,-1,-1] for i in range(self.NUM_DRONES)])
+            vel_hi = np.array([[1,1,1] for i in range(self.NUM_DRONES)])
             rpy_lo = np.array([[-np.pi,-np.pi,-np.pi] for i in range(self.NUM_DRONES)])
             rpy_hi = np.array([[np.pi,np.pi,np.pi] for i in range(self.NUM_DRONES)])
             ang_v_lo = np.array([[-2,-2,-2] for i in range(self.NUM_DRONES)])

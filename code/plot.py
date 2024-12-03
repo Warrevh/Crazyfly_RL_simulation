@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-filepath = "results/trained close target save-11.14.2024_21.36.56/evaluations.npz"
+filepath = "results/save-12.02.2024_21.18.28/evaluations.npz"
 
 data = np.load(filepath)
 
