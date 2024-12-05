@@ -359,19 +359,18 @@ class RLEnvironment(BaseRLAviary):
         return False
     
     def get_Random_inital_pos(self):
-        step_size_max = 0.1
+        step_size = 0.1
         min_position = 0.5
         max_position = 4.5
 
-        position = self.INIT_XYZS
+        position = self.INIT_XYZS[0,0]
 
-        step = np.random.uniform(-step_size_max, step_size_max)
-        position[0,0] += step #allong x-axis
+        direction = np.random.choice([-1, 1])
+        step = step_size*direction
+        position += step #allong x-axis
        
-        position = np.clip(position[0,0], min_position, max_position)
-
-        self.INIT_XYZS = position
-        print(self.INIT_XYZS)
+        position = np.clip(position, min_position, max_position)
+        self.INIT_XYZS[0,0] = position
 
 class getAction():
 
