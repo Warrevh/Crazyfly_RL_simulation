@@ -1,5 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import torch
+
+from stable_baselines3 import DDPG
 
 
 class Txt_File:
@@ -16,40 +20,83 @@ class Txt_File:
             for key, value in par.items():
                 f.write(f"{key}: {value}\n")
 
-class plot:
-    def __init__(self,model):
-        self.model = model
+class Plot:
+    def __init__(self,file):
+        self.file = file
 
-    def VisValue(self):
+    def VisValue(self,model_type):
 
-        critic = self.model.policy.critic
-        actor = self.model.policy.actor
+        model_type += '_model.zip'
+        filename = os.path.join(self.file, model_type)
 
-        x = np.linspace(0, 5, 5000)
-        y = np.linspace(0, 4, 4000)
+        model = DDPG.load(filename)
 
-        action_range = np.linspace(-1, 1, 1000)
+        critic = model.policy.critic
+        actor = model.policy.actor
 
-        q_values = np.zeros((len(x), len(y)))
+        x_range = np.linspace(0, 5, 50)
+        y_range = np.linspace(0, 4, 40)
 
-        for i, x in enumerate(x):
-            for j, y in enumerate(y):
-                state_tensor = self.model.policy.convert_to_tensor([x, y])
+        action = np.array([[-1,-1]])
+        action_tensor = torch.tensor(action)
+
+
+        q_values = np.zeros((len(x_range), len(y_range)))
+
+        for i, x in enumerate(x_range):
+            print(i)
+            for j, y in enumerate(y_range):
+                state = self.dictState(x, y)
+                with model.policy.device:
+                    q_value = critic(state, action_tensor)[0].item()
                 
-                action_qs = []
-                for action in action_range:
-                    action_tensor = self.model.policy.convert_to_tensor([[action]])
-                    with self.model.policy.device:
-                        q_value = critic(state_tensor, action_tensor).item()
-                    action_qs.append(q_value)
-                
-                q_values[i, j] = np.mean(action_qs)
+                q_values[i, j] = q_value
         
 
         plt.figure(figsize=(8, 6))
-        plt.contourf(x, y, q_values.T, levels=50, cmap='viridis')
+        plt.contourf(x_range, y_range, q_values.T, levels=50, cmap='viridis')
         plt.colorbar(label="Average Q-Value")
         plt.xlabel("X (State)")
         plt.ylabel("Y (State)")
         plt.title("Average Q-Value Contour Map")
         plt.show()
+
+    def PlotReward(self):
+        filename = os.path.join(self.file, 'evaluations.npz')
+
+        data = np.load(filename)
+
+        steps = data['timesteps'] 
+        rewards = data['results']
+
+        avg_rewards = rewards.mean(axis=1)
+
+        print(np.max(avg_rewards))
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(steps, avg_rewards, label="Reward vs Steps", color="blue")
+
+        plt.title("Reward vs Steps")
+        plt.xlabel("Steps")
+        plt.ylabel("Reward")
+        plt.legend()
+        plt.grid(True)
+
+        plt.show()
+
+    def dictState(self,x,y):
+        NUM_DRONES = 1
+        vel = np.zeros((NUM_DRONES,3))
+        rpy = np.zeros((NUM_DRONES,3))
+        ang_v = np.zeros((NUM_DRONES,3))
+    
+        pos = np.array([[x,y,0.2]])
+
+        ret = {
+                "Position": torch.tensor(np.array([pos[i,:] for i in range(NUM_DRONES)]).astype('float32')),
+                "Velocity": torch.tensor(np.array([vel[i,:] for i in range(NUM_DRONES)]).astype('float32')),
+                "rpy": torch.tensor(np.array([rpy[i,:] for i in range(NUM_DRONES)]).astype('float32')),
+                "ang_v": torch.tensor(np.array([ang_v[i,:] for i in range(NUM_DRONES)]).astype('float32')),
+            }
+        
+        return ret

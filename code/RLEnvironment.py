@@ -304,7 +304,7 @@ class RLEnvironment(BaseRLAviary):
                 vel[i,:]=obs[10:13]
                 rpy[i,:]=obs[7:10]
                 ang_v[i,:]=obs[13:16]
-
+                
             act = np.empty((0, 2))
             for i in range(self.ACTION_BUFFER_SIZE):
                 act = np.append(act,np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)]),axis=0)
