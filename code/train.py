@@ -31,9 +31,9 @@ parameters = {
     'Target_reward': 100000,
     #Reward Function
     'Rew_distrav_fact': 0,
-    'Rew_disway_fact': 0,
-    'Rew_step_fact': 0.1,
-    'Rew_tardis_fact': 1,
+    'Rew_disway_fact': 0.01,
+    'Rew_step_fact': 0,
+    'Rew_tardis_fact': 100,
     #evaluation callback
     'eval_freq': 1, #"epsisodes" (eval_freq*(epsiode_length*ctrl_freq))
     #observation !!!!!!! ADJUST MANUALY IN CODE !!!!!!!
