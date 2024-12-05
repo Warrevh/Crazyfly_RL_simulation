@@ -26,6 +26,7 @@ class RLEnvironment(BaseRLAviary):
                  ):
         
         self.INITIAL_XYZS = parameters['initial_xyzs'] #np.array([[4.5,3.5,0.2]]) #np.array([[-1.5,-1.5,0.2]])
+        self.Random_initial_pos = parameters['random_initial_pos']
         self.CTRL_FREQ = parameters['ctrl_freq']
         self.Rew_distrav_fact = parameters['Rew_distrav_fact']
         self.Rew_disway_fact = parameters['Rew_disway_fact']
@@ -109,9 +110,14 @@ class RLEnvironment(BaseRLAviary):
         state = self._getDroneStateVector(0)
         if np.linalg.norm(self.TARGET_POS[0:2]-state[0:2]) < self.TARGET_RAD:
             print("Terminated")
-            return True
+            Terminated = True
         else:
-            return False
+            Terminated = False
+        
+        if self.Random_initial_pos and Terminated:
+            self.get_Random_inital_pos()
+
+        return Terminated
 
     def _computeTruncated(self):
 
@@ -120,14 +126,14 @@ class RLEnvironment(BaseRLAviary):
              or abs(state[7]) > .9 or abs(state[8]) > .9 # Truncate when the drone is too tilted
             ):
             print("tillted/outofbound")
-            return True
+            Truncated = True
         
     
         
         if self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
 
             print("Timeout")
-            return True
+            Truncated = True
 
     
         
@@ -139,7 +145,12 @@ class RLEnvironment(BaseRLAviary):
             """
         
         else:
-            return False
+            Truncated = False
+        
+        if self.Random_initial_pos and Truncated:
+            self.get_Random_inital_pos()
+
+        return Truncated
         
     def _addObstacles(self):
 
@@ -346,6 +357,21 @@ class RLEnvironment(BaseRLAviary):
                 return True
         
         return False
+    
+    def get_Random_inital_pos(self):
+        step_size_max = 0.1
+        min_position = 0.5
+        max_position = 4.5
+
+        position = self.INIT_XYZS
+
+        step = np.random.uniform(-step_size_max, step_size_max)
+        position[0,0] += step #allong x-axis
+       
+        position = np.clip(position[0,0], min_position, max_position)
+
+        self.INIT_XYZS = position
+        print(self.INIT_XYZS)
 
 class getAction():
 

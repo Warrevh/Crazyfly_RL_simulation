@@ -21,6 +21,7 @@ from data_handling import Txt_File
 parameters = {
     #env parameters
     'initial_xyzs': np.array([[4.5,3.5,0.2]]),
+    'random_initial_pos': True,
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,

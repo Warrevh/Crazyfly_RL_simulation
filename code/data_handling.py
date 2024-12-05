@@ -34,11 +34,13 @@ class Plot:
         critic = model.policy.critic
         actor = model.policy.actor
 
-        x_range = np.linspace(0, 5, 50)
-        y_range = np.linspace(0, 4, 40)
+        x_range = np.linspace(0, 5, 5000)
+        y_range = np.linspace(0, 4, 4000)
 
+        """
         action = np.array([[-1,-1]])
         action_tensor = torch.tensor(action)
+        """
 
 
         q_values = np.zeros((len(x_range), len(y_range)))
@@ -47,9 +49,9 @@ class Plot:
             print(i)
             for j, y in enumerate(y_range):
                 state = self.dictState(x, y)
+                action_predicted = actor(state)
                 with model.policy.device:
-                    q_value = critic(state, action_tensor)[0].item()
-                
+                    q_value = critic(state, action_predicted)[0].item()
                 q_values[i, j] = q_value
         
 
