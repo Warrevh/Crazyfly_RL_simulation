@@ -21,9 +21,10 @@ from data_handling import Txt_File
 parameters = {
     #env parameters
     'initial_xyzs': np.array([[4.5,3.5,0.2]]),
+    'random_initial_pos': True,
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
-    'episode_length': 40,
+    'episode_length': 30,
     #Learning rate
     'Learning_rate': 0.0005,
     'Learning_rate_decay': -0.005,
@@ -31,11 +32,11 @@ parameters = {
     'Target_reward': 100000,
     #Reward Function
     'Rew_distrav_fact': 0,
-    'Rew_disway_fact': 0.1,
+    'Rew_disway_fact': 0.01,
     'Rew_step_fact': 0,
-    'Rew_tardis_fact': 1,
+    'Rew_tardis_fact': 100,
     #evaluation callback
-    'eval_freq': 5, #"epsisodes" (eval_freq*(epsiode_length*ctrl_freq))
+    'eval_freq': 1, #"epsisodes" (eval_freq*(epsiode_length*ctrl_freq))
     #observation !!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'position': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'velocity': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
@@ -43,8 +44,8 @@ parameters = {
     'ang_v': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'prev_act':False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     #train
-    'Total_timesteps': int(30e6),
-    'train_freq': int(240//2),
+    'Total_timesteps': int(10e6),
+    'train_freq': 1,
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))-self.Rew_disway_fact*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis))'
 }
 
@@ -69,7 +70,7 @@ print('[INFO] Action space:', train_env.action_space)
 print('[INFO] Observation space:', train_env.observation_space)
 
 n_actions = train_env.action_space.shape[-1]
-action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=0.5 * np.ones(n_actions),theta=0.10, dt=1)
+action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=1 * np.ones(n_actions),theta=0.10, dt=1)
 
 def lineair_decay(progress_remaining):
     progress_remaining
@@ -80,10 +81,10 @@ def lineair_decay(progress_remaining):
 model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip",train_env)
 """
 model = DDPG('MultiInputPolicy',train_env,
-             learning_rate=lineair_decay,
+             learning_rate=parameters['Learning_rate'],
              learning_starts=1,
              action_noise=action_noise,
-             train_freq= (int(eval_env.CTRL_FREQ//2), "step"), #int(eval_env.CTRL_FREQ//2)
+             train_freq= (int(1), "step"), #int(eval_env.CTRL_FREQ//2)
              replay_buffer_class= DictReplayBuffer,
              verbose=1)
 

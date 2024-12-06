@@ -26,6 +26,7 @@ class RLEnvironment(BaseRLAviary):
                  ):
         
         self.INITIAL_XYZS = parameters['initial_xyzs'] #np.array([[4.5,3.5,0.2]]) #np.array([[-1.5,-1.5,0.2]])
+        self.Random_initial_pos = parameters['random_initial_pos']
         self.CTRL_FREQ = parameters['ctrl_freq']
         self.Rew_distrav_fact = parameters['Rew_distrav_fact']
         self.Rew_disway_fact = parameters['Rew_disway_fact']
@@ -109,9 +110,14 @@ class RLEnvironment(BaseRLAviary):
         state = self._getDroneStateVector(0)
         if np.linalg.norm(self.TARGET_POS[0:2]-state[0:2]) < self.TARGET_RAD:
             print("Terminated")
-            return True
+            Terminated = True
         else:
-            return False
+            Terminated = False
+        
+        if self.Random_initial_pos and Terminated:
+            self.get_Random_inital_pos()
+
+        return Terminated
 
     def _computeTruncated(self):
 
@@ -120,14 +126,14 @@ class RLEnvironment(BaseRLAviary):
              or abs(state[7]) > .9 or abs(state[8]) > .9 # Truncate when the drone is too tilted
             ):
             print("tillted/outofbound")
-            return True
+            Truncated = True
         
     
         
         if self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
 
             print("Timeout")
-            return True
+            Truncated = True
 
     
         
@@ -139,7 +145,12 @@ class RLEnvironment(BaseRLAviary):
             """
         
         else:
-            return False
+            Truncated = False
+        
+        if self.Random_initial_pos and Truncated:
+            self.get_Random_inital_pos()
+
+        return Truncated
         
     def _addObstacles(self):
 
@@ -240,8 +251,8 @@ class RLEnvironment(BaseRLAviary):
 
             pos_lo = np.array([[-5,-5,0] for i in range(self.NUM_DRONES)])
             pos_hi = np.array([[5,5,3] for i in range(self.NUM_DRONES)])
-            vel_lo = np.array([[-50,-50,-50] for i in range(self.NUM_DRONES)])
-            vel_hi = np.array([[50,50,50] for i in range(self.NUM_DRONES)])
+            vel_lo = np.array([[-1,-1,-1] for i in range(self.NUM_DRONES)])
+            vel_hi = np.array([[1,1,1] for i in range(self.NUM_DRONES)])
             rpy_lo = np.array([[-np.pi,-np.pi,-np.pi] for i in range(self.NUM_DRONES)])
             rpy_hi = np.array([[np.pi,np.pi,np.pi] for i in range(self.NUM_DRONES)])
             ang_v_lo = np.array([[-2,-2,-2] for i in range(self.NUM_DRONES)])
@@ -260,7 +271,7 @@ class RLEnvironment(BaseRLAviary):
             ret = spaces.Dict({
                 "Position": spaces.Box(low=pos_lo, high=pos_hi,dtype=np.float32),
                 "Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
-                #"rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
+                "rpy": spaces.Box(low=rpy_lo, high=rpy_hi,dtype=np.float32),
                 "ang_v": spaces.Box(low=ang_v_lo, high=ang_v_hi,dtype=np.float32),
                 #"prev_act": spaces.Box(low=act_lower_bound, high=act_upper_bound,dtype=np.float32)
             })
@@ -304,7 +315,7 @@ class RLEnvironment(BaseRLAviary):
                 vel[i,:]=obs[10:13]
                 rpy[i,:]=obs[7:10]
                 ang_v[i,:]=obs[13:16]
-
+                
             act = np.empty((0, 2))
             for i in range(self.ACTION_BUFFER_SIZE):
                 act = np.append(act,np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)]),axis=0)
@@ -312,7 +323,7 @@ class RLEnvironment(BaseRLAviary):
             ret = {
                 "Position": np.array([pos[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
-                #"rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
+                "rpy": np.array([rpy[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "ang_v": np.array([ang_v[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 #"prev_act": act.astype('float32')
             }
@@ -346,6 +357,20 @@ class RLEnvironment(BaseRLAviary):
                 return True
         
         return False
+    
+    def get_Random_inital_pos(self):
+        step_size = 0.1
+        min_position = 0.5
+        max_position = 4.5
+
+        position = self.INIT_XYZS[0,0]
+
+        direction = np.random.choice([-1, 1])
+        step = step_size*direction
+        position += step #allong x-axis
+       
+        position = np.clip(position, min_position, max_position)
+        self.INIT_XYZS[0,0] = position
 
 class getAction():
 
