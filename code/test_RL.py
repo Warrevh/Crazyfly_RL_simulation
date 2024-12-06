@@ -10,7 +10,8 @@ from RLEnvironment import RLEnvironment
 
 parameters = {
     #env parameters
-    'initial_xyzs': np.array([[4.5,2.5,0.2]]),
+    'initial_xyzs': np.array([[4.5,3.5,0.2]]),
+    'random_initial_pos': False,
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,
@@ -21,7 +22,7 @@ parameters = {
     'Target_reward': 100000,
     #Reward Function
     'Rew_distrav_fact': 0,
-    'Rew_disway_fact': 0.0,
+    'Rew_disway_fact': 0.01,
     'Rew_step_fact': 0,
     'Rew_tardis_fact': 100,
     #evaluation callback
@@ -46,7 +47,7 @@ test_env = RLEnvironment( parameters=parameters ,gui=True )
 #model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
 #model = DDPG.load("results/trained big box save-11.20.2024_21.19.39/final_model.zip")
 #model = DDPG.load("results/trained big box save-11.20.2024_21.19.39/best_model.zip")
-model = DDPG.load("results/trained_save-12.05.2024_03.16.34/best_model.zip")
+model = DDPG.load("results/trained_save-12.06.2024_00.43.11/best_model.zip")
 
 mean_reward, std_reward = evaluate_policy(model,
                                             test_env,

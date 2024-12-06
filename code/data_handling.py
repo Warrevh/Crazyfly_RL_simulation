@@ -24,21 +24,25 @@ class Plot:
     def __init__(self,file):
         self.file = file
 
+        self.plot_path = os.path.join(file, 'plots')
+        if not os.path.exists(self.plot_path):
+            os.makedirs(self.plot_path+'/')
+
     def VisValue(self,model_type):
 
-        model_type += '_model.zip'
-        filename = os.path.join(self.file, model_type)
+        model_type_ = model_type + '_model.zip'
+        filename = os.path.join(self.file, model_type_)
 
         model = DDPG.load(filename)
 
         critic = model.policy.critic
         actor = model.policy.actor
 
-        x_range = np.linspace(0, 5, 5000)
-        y_range = np.linspace(0, 4, 4000)
+        x_range = np.linspace(0, 5, 500)
+        y_range = np.linspace(0, 4, 400)
 
         """
-        action = np.array([[-1,-1]])
+        action = np.array([[-1,0]])
         action_tensor = torch.tensor(action)
         """
 
@@ -53,7 +57,6 @@ class Plot:
                 with model.policy.device:
                     q_value = critic(state, action_predicted)[0].item()
                 q_values[i, j] = q_value
-        
 
         plt.figure(figsize=(8, 6))
         plt.contourf(x_range, y_range, q_values.T, levels=50, cmap='viridis')
@@ -61,6 +64,13 @@ class Plot:
         plt.xlabel("X (State)")
         plt.ylabel("Y (State)")
         plt.title("Average Q-Value Contour Map")
+
+        target_x = 2.5
+        target_y = 2
+        plt.scatter(target_x, target_y, color='red', s=50, label="Target")
+        plt.legend()
+
+        plt.savefig(self.plot_path+"/"+model_type+"_average_q_value_contour.png", dpi=1000)
         plt.show()
 
     def PlotReward(self):
@@ -83,7 +93,7 @@ class Plot:
         plt.ylabel("Reward")
         plt.legend()
         plt.grid(True)
-
+        plt.savefig(self.plot_path+"/Rewards.png", dpi=1000)
         plt.show()
 
     def dictState(self,x,y):
