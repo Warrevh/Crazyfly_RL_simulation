@@ -32,6 +32,8 @@ class RLEnvironment(BaseRLAviary):
         self.Rew_disway_fact = parameters['Rew_disway_fact']
         self.Rew_step_fact = parameters['Rew_step_fact']
         self.Rew_tardis_fact= parameters['Rew_tardis_fact']
+        self.Rew_colision = parameters['Rew_collision']
+        self.Rew_terminated = parameters['Rew_terminated']
 
         self.act2d = True
 
@@ -97,9 +99,9 @@ class RLEnvironment(BaseRLAviary):
                +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)) #positive if moved in direction of target
          
         if self._getCollision(self.DRONE_IDS[0]):
-            ret = -100 #reward for hitting wall
+            ret = self.Rew_colision #reward for hitting wall
         elif self._computeTerminated():
-            ret = 1000 #reward for reaching target
+            ret = self.Rew_terminated #reward for reaching target
         elif self.waypoint and self.hit_waypoint():
             ret = 100 #reward for reaching waypoint
 
@@ -191,6 +193,7 @@ class RLEnvironment(BaseRLAviary):
         if self.act2d == True and self.ACT_TYPE == ActionType.PID:
             self.action_buffer.append(action)
             rpm = np.zeros((self.NUM_DRONES,4))
+            #print(action)
             for k in range(action.shape[0]):
                 target = action[k, :]
                 state = self._getDroneStateVector(k)
