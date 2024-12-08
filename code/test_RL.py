@@ -3,7 +3,7 @@ import numpy as np
 
 from gym_pybullet_drones.utils.utils import sync
 
-from stable_baselines3 import DDPG
+from stable_baselines3 import DDPG, SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from RLEnvironment import RLEnvironment
@@ -11,7 +11,7 @@ from RLEnvironment import RLEnvironment
 parameters = {
     #env parameters
     'initial_xyzs': np.array([[4.5,3.5,0.2]]),
-    'random_initial_pos': False,
+    'random_initial_pos': True,
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,
@@ -25,6 +25,8 @@ parameters = {
     'Rew_disway_fact': 0.01,
     'Rew_step_fact': 0,
     'Rew_tardis_fact': 100,
+    'Rew_collision': -1000,
+    'Rew_terminated': 1000,
     #evaluation callback
     'eval_freq': 1, #"epsisodes" (eval_freq*(epsiode_length*ctrl_freq))
     #observation !!!!!!! ADJUST MANUALY IN CODE !!!!!!!
@@ -47,7 +49,7 @@ test_env = RLEnvironment( parameters=parameters ,gui=True )
 #model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
 #model = DDPG.load("results/trained big box save-11.20.2024_21.19.39/final_model.zip")
 #model = DDPG.load("results/trained big box save-11.20.2024_21.19.39/best_model.zip")
-model = DDPG.load("results/trained_save-12.06.2024_00.43.11/best_model.zip")
+model = SAC.load("results/SAC_save-12.07.2024_22.03.53/best_model.zip")
 
 mean_reward, std_reward = evaluate_policy(model,
                                             test_env,

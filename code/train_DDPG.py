@@ -26,9 +26,9 @@ class Train_DDPG():
 
         self.train_giu = train_gui
 
-        output_folder= 'results'
+        self.output_folder= 'results'
 
-        self.filename = os.path.join(output_folder, 'DDPG_save-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
+        self.filename = os.path.join(self.output_folder, 'DDPG_save-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
         if not os.path.exists(self.filename):
             os.makedirs(self.filename+'/')
 
@@ -37,14 +37,16 @@ class Train_DDPG():
 
     def train_DDPG(self):
 
-        train_env = make_vec_env(lambda: RLEnvironment(parameters=self.parameters),n_envs=1, seed=0)
+        train_env = make_vec_env(RLEnvironment,
+                                 env_kwargs=dict(parameters=self.parameters),
+                                 n_envs=self.parameters['number_of_env'], seed=0)
 
         eval_env = RLEnvironment(parameters=self.parameters,gui = self.train_giu)
 
         print('[INFO] Action space:', train_env.action_space)
         print('[INFO] Observation space:', train_env.observation_space)
 
-        n_actions = train_env.action_space.shape[-1]
+        n_actions = train_env.action_space.shape
         action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=1 * np.ones(n_actions),theta=0.10, dt=1)
 
         def lineair_decay(progress_remaining):
@@ -76,7 +78,7 @@ class Train_DDPG():
                                         deterministic=True,
                                         render=self.train_giu)
 
-        model.learn(total_timesteps=self.parameters['Total_timesteps'],callback=eval_callback,log_interval=1)
+        model.learn(total_timesteps=self.parameters['Total_timesteps'],callback=eval_callback,log_interval=self.parameters['number_of_env'])
 
         model.save(self.filename+'/final_model.zip')
         print(self.filename)

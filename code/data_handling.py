@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import torch
 
-from stable_baselines3 import DDPG
+from stable_baselines3 import DDPG,SAC
 
 
 class Txt_File:
@@ -33,7 +33,7 @@ class Plot:
         model_type_ = model_type + '_model.zip'
         filename = os.path.join(self.file, model_type_)
 
-        model = DDPG.load(filename)
+        model = SAC.load(filename)
 
         critic = model.policy.critic
         actor = model.policy.actor
