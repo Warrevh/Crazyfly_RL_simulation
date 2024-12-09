@@ -4,8 +4,8 @@ from train_SAC import Train_SAC
 
 parameters = {
     #env parameters
-    'initial_xyzs': np.array([[2.5,3.5,0.2]]),
-    'random_initial_pos': True,
+    'initial_xyzs': np.array([[4.5,3.5,0.2]]),
+    'random_initial_pos': False,
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,

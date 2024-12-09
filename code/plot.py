@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 
 from data_handling import Plot
 
-filepath = "results/SAC_save-12.06.2024_17.36.39"
+filepath = "results/DDPG_save-12.08.2024_23.19.52"
 
 plot = Plot(filepath)
 plot.PlotReward()
-plot.VisValue('final')
+plot.VisValue('best')
 
 
 
