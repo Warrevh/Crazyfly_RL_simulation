@@ -73,7 +73,7 @@ class Train_DDPG():
         eval_callback = EvalCallback(eval_env,
                                         callback_on_new_best=callback_on_best,
                                         verbose=1,
-                                        n_eval_episodes= 2,
+                                        n_eval_episodes= self.parameters['eval_episodes'],
                                         best_model_save_path=self.filename+'/',
                                         log_path=self.filename+'/',
                                         eval_freq=self.eval_freq,

@@ -33,7 +33,7 @@ class Plot:
         model_type_ = model_type + '_model.zip'
         filename = os.path.join(self.file, model_type_)
 
-        model = DDPG.load(filename)
+        model = SAC.load(filename)
 
         critic = model.policy.critic
         actor = model.policy.actor
@@ -60,17 +60,17 @@ class Plot:
 
         plt.figure(figsize=(8, 6))
         plt.contourf(x_range, y_range, q_values.T, levels=50, cmap='viridis')
-        plt.colorbar(label="Average Q-Value")
+        plt.colorbar(label="Average Value")
         plt.xlabel("X (State)")
         plt.ylabel("Y (State)")
-        plt.title("Average Q-Value Contour Map")
+        plt.title("Average Value Contour Map")
 
         target_x = 2.5
         target_y = 2
         plt.scatter(target_x, target_y, color='red', s=50, label="Target")
         plt.legend()
 
-        plt.savefig(self.plot_path+"/"+model_type+"_average_q_value_contour.png", dpi=1000)
+        plt.savefig(self.plot_path+"/"+model_type+"_average_value_contour.png", dpi=1000)
         plt.show()
 
     def PlotReward(self):
@@ -86,14 +86,14 @@ class Plot:
         print(np.max(avg_rewards))
 
         plt.figure(figsize=(10, 6))
-        plt.plot(steps, avg_rewards, label="Reward vs Steps", color="blue")
+        plt.plot(steps, avg_rewards, label="Return vs Steps", color="blue")
 
-        plt.title("Reward vs Steps")
+        plt.title("Return vs Steps")
         plt.xlabel("Steps")
-        plt.ylabel("Reward")
+        plt.ylabel("Return")
         plt.legend()
         plt.grid(True)
-        plt.savefig(self.plot_path+"/Rewards.png", dpi=1000)
+        plt.savefig(self.plot_path+"/Return.png", dpi=1000)
         plt.show()
 
     def dictState(self,x,y):
