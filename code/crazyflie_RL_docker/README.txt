@@ -1,1 +1,0 @@
-copy this code in the docker container in the cf_nodes folder
