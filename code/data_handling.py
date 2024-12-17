@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import torch
+from datetime import datetime
+import csv
 
 from stable_baselines3 import DDPG,SAC
 
@@ -83,12 +85,18 @@ class Plot:
 
         avg_rewards = rewards.mean(axis=1)
 
+        window = 15
+        moving_avg_rewards = np.convolve(avg_rewards, np.ones(window)/window, mode='valid')
+
+        steps_moving_avg = steps[:len(moving_avg_rewards)]
+
+
         print(np.max(avg_rewards))
 
         plt.figure(figsize=(10, 6))
-        plt.plot(steps, avg_rewards, label="Return vs Steps", color="blue")
+        plt.plot(steps_moving_avg, moving_avg_rewards, label="MA Return vs Steps", color="blue")
 
-        plt.title("Return vs Steps")
+        plt.title("MA Return vs Steps")
         plt.xlabel("Steps")
         plt.ylabel("Return")
         plt.legend()
@@ -112,3 +120,109 @@ class Plot:
             }
         
         return ret
+    
+class Logger_obs():
+    def __init__(self,store_path):
+        self.store_path = store_path
+        current_time = datetime.now().strftime("%m.%d.%Y_%H.%M.%S")
+        self.file_path = str(self.store_path + f"/obs_log_sim_{current_time}.txt")
+
+        self.all_obs = []
+
+    def log_obs(self,obs):
+        flattened_obs = [
+            obs["Position"][0][0], obs["Position"][0][1], obs["Position"][0][2],  # Position (x, y, z)
+            obs["Velocity"][0][0], obs["Velocity"][0][1], obs["Velocity"][0][2],  # Velocity (x, y, z)
+            obs["rpy"][0][0], obs["rpy"][0][1], obs["rpy"][0][2],                # Roll, Pitch, Yaw
+            obs["ang_v"][0][0], obs["ang_v"][0][1], obs["ang_v"][0][2]          # Angular velocity (x, y, z)
+        ]
+        self.all_obs.append(flattened_obs)  # Append the observation to the log
+
+    def save_obs(self):
+        headers = [
+            "Position_x", "Position_y", "Position_z",
+            "Velocity_x", "Velocity_y", "Velocity_z",
+            "Roll", "Pitch", "Yaw",
+            "AngularVelocity_x", "AngularVelocity_y", "AngularVelocity_z"
+        ]
+        
+        # Write the collected data to a CSV file
+        with open(self.file_path, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)  # Write the header row
+            writer.writerows(self.all_obs)  # Write all the collected data
+            print("observation written to file "+ self.file_path)
+
+class Plot_obs():
+    def __init__(self,file):
+        self.file = file
+        self.all_obs = np.loadtxt(self.file,delimiter=',', skiprows=1)
+
+        self.column_indices = {
+                "Position_x": 0, "Position_y": 1, "Position_z": 2,        # Position
+                "Velocity_x": 3, "Velocity_y": 4, "Velocity_z": 5,     # Velocity
+                "Roll": 6, "Pitch": 7, "Yaw": 8,        # Roll, Pitch, Yaw
+                "AngularVelocity_x": 9, "AngularVelocity_y": 10, "AngularVelocity_z": 11    # Angular Velocity
+            }
+        
+        self.colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'cyan', 'magenta']
+
+    def plot_single_value(self,value):
+        value_index = self.get_column_index(value)
+        plotted_value = [obs[value_index] for obs in self.all_obs]
+        steps = list(range(1, len(self.all_obs) + 1)) 
+
+        # Create the plot
+        plt.figure(figsize=(8, 5))
+        plt.plot(steps, plotted_value, linestyle='-', color='blue', label= value)
+
+        # Add labels and title
+        plt.xlabel('Steps')
+        plt.ylabel(value)
+        plt.title(value+' vs. Steps')
+        plt.legend()
+        plt.grid(True)
+
+        # Show the plot
+        plt.show()
+
+    def plot_multiple_value(self,values):
+        steps = list(range(1, len(self.all_obs) + 1))
+        plt.figure(figsize=(8, 5))
+        for i, value in enumerate(values):
+            value_index = self.get_column_index(value)
+            plotted_value = [obs[value_index] for obs in self.all_obs]
+            color = self.colors[i % len(self.colors)]
+            plt.plot(steps, plotted_value, linestyle='-', color=color, label= value)
+
+
+        plt.xlabel('Steps')
+        plt.ylabel('m')
+        plt.title('Position vs. Steps')
+        plt.legend()
+        plt.grid(True)
+
+        # Show the plot
+        plt.show()
+            
+    def plot_xy_position(self):
+        x_pos = [obs[0] for obs in self.all_obs]
+        y_pos = [obs[1] for obs in self.all_obs]
+
+        # Create the plot
+        plt.figure(figsize=(8, 5))
+        plt.plot(x_pos, y_pos, linestyle='-', color='blue', label= 'position')
+
+        # Add labels and title
+        plt.xlabel('x(m)')
+        plt.ylabel('y(m)')
+        plt.title('Drone path')
+        plt.legend()
+        plt.grid(True)
+
+        # Show the plot
+        plt.show()
+
+    # Function to get the corresponding column index
+    def get_column_index(self,name):
+        return self.column_indices.get(name, "Invalid name")

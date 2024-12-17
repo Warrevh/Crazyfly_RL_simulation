@@ -1,0 +1,2 @@
+Position_x,Position_y,Position_z,Velocity_x,Velocity_y,Velocity_z,Roll,Pitch,Yaw,AngularVelocity_x,AngularVelocity_y,AngularVelocity_z
+6.120697021484375,0.18126501142978668,-0.017597254365682602,0.0,0.0,0.0,0.009424647316336632,-0.04800901934504509,0.1188277155160904,0.0,0.0,0.0
