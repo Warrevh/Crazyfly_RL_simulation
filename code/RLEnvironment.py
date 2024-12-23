@@ -390,8 +390,6 @@ class RLEnvironment(BaseRLAviary):
         theta = np.random.uniform(0, 2 * np.pi)
         self.INITIAL_XYZS[0,0] = r * np.cos(theta) + self.Original_initialXYZS[0,0]
         self.INITIAL_XYZS[0,1] = r * np.sin(theta) + self.Original_initialXYZS[0,1]
-        print(self.INITIAL_XYZS)
-        print(self.Original_initialXYZS)
 
 class getAction():
 

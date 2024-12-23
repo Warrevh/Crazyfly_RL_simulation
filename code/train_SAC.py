@@ -49,22 +49,20 @@ class Train_SAC():
         n_actions = train_env.action_space.shape
         action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=1/3 * np.ones(n_actions))
 
-        def lineair_decay(progress_remaining):
-            progress_remaining
-            return self.parameters['Learning_rate'] * np.exp(self.parameters['Learning_rate_decay'] * progress_remaining)
-
-        
+        """
         model = SAC.load("results/trained_SAC_save-12.16.2024_01.10.16/best_model.zip",train_env)
         """
         model = SAC('MultiInputPolicy',train_env,
                     learning_rate=self.parameters['Learning_rate'],
-                    learning_starts=1,
+                    learning_starts=self.parameters['learning_starts'],
+                    batch_size=self.parameters['batch_size'],
                     action_noise=action_noise,
-                    train_freq= (int(1), "step"), #int(eval_env.CTRL_FREQ//2)
-                    replay_buffer_class= DictReplayBuffer,
+                    train_freq= (int(self.parameters['train_freq']), "step"), #int(eval_env.CTRL_FREQ//2)
+                    gradient_steps=self.parameters['gradient_steps'],
+                    use_sde=self.parameters['use_sde'],
                     verbose=1)
         
-        """
+        
         target_reward = self.parameters['Target_reward']
 
         callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=target_reward,

@@ -49,19 +49,17 @@ class Train_DDPG():
         n_actions = train_env.action_space.shape
         action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=1/3 * np.ones(n_actions))
 
-        def lineair_decay(progress_remaining):
-            progress_remaining
-            return self.parameters['Learning_rate'] * np.exp(self.parameters['Learning_rate_decay'] * progress_remaining)
 
         """
         model = DDPG.load("results/DDPG_save-12.08.2024_23.19.52/final_model.zip",train_env)
         """
         model = DDPG('MultiInputPolicy',train_env,
                     learning_rate=self.parameters['Learning_rate'],
-                    learning_starts=1,
+                    learning_starts=self.parameters['learning_starts'],
+                    batch_size=self.parameters['batch_size'],
                     action_noise=action_noise,
-                    train_freq= (int(1), "step"), #int(eval_env.CTRL_FREQ//2)
-                    replay_buffer_class= DictReplayBuffer,
+                    train_freq= (int(self.parameters['train_freq']), "step"), #int(eval_env.CTRL_FREQ//2)
+                    gradient_steps=self.parameters['gradient_steps'],
                     verbose=1)
     
 

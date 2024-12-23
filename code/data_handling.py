@@ -85,7 +85,7 @@ class Plot:
 
         avg_rewards = rewards.mean(axis=1)
 
-        window = 15
+        window = 10
         moving_avg_rewards = np.convolve(avg_rewards, np.ones(window)/window, mode='valid')
 
         steps_moving_avg = steps[:len(moving_avg_rewards)]

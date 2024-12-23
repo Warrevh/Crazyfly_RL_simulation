@@ -51,7 +51,7 @@ start_pos= np.array([[1,3.5,0.2]]) #np.array([[4.5,3.5,0.2]])  #
 
 test_env = RLEnvironment( parameters=parameters ,gui=True )
 
-folder = "results/trained_SAC_save-12.16.2024_01.10.16"
+folder = "results/SAC_save-12.23.2024_00.22.10"
 
 #model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip")
 #model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
@@ -63,13 +63,13 @@ log = Logger_obs(folder)
 
 mean_reward, std_reward = evaluate_policy(model,
                                             test_env,
-                                            n_eval_episodes=20
+                                            n_eval_episodes=5
                                             )
 print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
 
 obs, info = test_env.reset(seed=42, options={})
 start = time.time()
-"""
+
 for i in range((test_env.EPISODE_LEN_SEC+4)*test_env.CTRL_FREQ):
     action, _states = model.predict(obs,
                                     deterministic=True
@@ -87,4 +87,3 @@ for i in range((test_env.EPISODE_LEN_SEC+4)*test_env.CTRL_FREQ):
         break
 test_env.close()
 log.save_obs()
-"""
