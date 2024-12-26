@@ -11,7 +11,7 @@ parameters = {
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,
     #Learning
-    'Learning_rate': 0.0002,
+    'Learning_rate': 0.0001,
     'learning_starts': 100000,
     'batch_size':1000,
     'use_sde':True ,
@@ -40,7 +40,7 @@ parameters = {
     'train_freq': 1,
     'gradient_steps': -1,
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
-    'parent_model': "results/trained_SAC_save-12.16.2024_01.10.16/best_model.zip"
+    'parent_model': "results/SAC_save-12.24.2024_00.37.24/final_model.zip"
 }
 
 #DDPG = Train_DDPG(parameters=parameters,train_gui=False)

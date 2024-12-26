@@ -7,7 +7,7 @@ obs_noise: True
 ctrl_freq: 240
 Target_pos: [2.5 2.  0.2]
 episode_length: 30
-Learning_rate: 0.0002
+Learning_rate: 0.0001
 learning_starts: 100000
 batch_size: 1000
 use_sde: True
@@ -31,4 +31,4 @@ Total_timesteps: 3000000
 train_freq: 1
 gradient_steps: -1
 Reward_Function: (-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))
-parent_model: none
+parent_model: results/SAC_save-12.24.2024_00.37.24/final_model.zip
