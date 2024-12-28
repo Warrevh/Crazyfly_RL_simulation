@@ -49,8 +49,8 @@ class Train_SAC():
         n_actions = train_env.action_space.shape
         action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=1/3 * np.ones(n_actions))
 
-        
-        model = SAC.load("results/SAC_save-12.24.2024_00.37.24/final_model.zip",train_env)
+        """"
+        model = SAC.load("results/SAC_save-12.24.2024_18.07.36/final_model.zip",train_env)
         """
         model = SAC('MultiInputPolicy',train_env,
                     learning_rate=self.parameters['Learning_rate'],
@@ -61,7 +61,7 @@ class Train_SAC():
                     gradient_steps=self.parameters['gradient_steps'],
                     use_sde=self.parameters['use_sde'],
                     verbose=1)
-        """
+        
         
         target_reward = self.parameters['Target_reward']
 

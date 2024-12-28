@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from data_handling import Plot,Plot_obs
 
-model_filepath = "results/SAC_save-12.24.2024_18.07.36"
+model_filepath = "results/SAC_save-12.27.2024_20.54.29"
 
 plot = Plot(model_filepath)
 plot.PlotReward()
