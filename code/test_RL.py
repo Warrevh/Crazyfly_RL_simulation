@@ -38,7 +38,8 @@ parameters = {
     #train
     'Total_timesteps': int(10e6),
     'train_freq': 1,
-    'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))-self.Rew_disway_fact*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis))'
+    'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
+    'parent_model': "results/SAC_save-12.27.2024_20.54.29/best_model.zip"
 }
 
 start_pos= np.array([[1,3.5,0.2]]) #np.array([[4.5,3.5,0.2]])  # 

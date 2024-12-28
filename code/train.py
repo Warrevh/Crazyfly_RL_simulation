@@ -9,11 +9,13 @@ parameters = {
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,
-    #Learning rate
-    'Learning_rate': 0.0005,
-    'Learning_rate_decay': -0.005,
+    #Learning
+    'Learning_rate': 0.0001,
+    'learning_starts': 100000,
+    'batch_size':1000,
+    'use_sde':True ,
     #Reward
-    'Target_reward': 100000,
+    'Target_reward': 1500,
     #Reward Function
     'Rew_distrav_fact': 0,
     'Rew_disway_fact': 0.01,
@@ -30,10 +32,12 @@ parameters = {
     'ang_v': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'prev_act':False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     #train
-    'number_of_env': 16,
-    'Total_timesteps': int(10e6),
+    'number_of_env': 1,
+    'Total_timesteps': int(3e6),
     'train_freq': 1,
-    'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))-self.Rew_disway_fact*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis))'
+    'gradient_steps': -1,
+    'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
+    'parent_model': "results/SAC_save-12.24.2024_00.37.24/final_model.zip"
 }
 
 DDPG = Train_DDPG(parameters=parameters,train_gui=False)
