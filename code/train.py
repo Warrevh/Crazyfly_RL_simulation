@@ -22,7 +22,7 @@ parameters = {
     'Rew_distrav_fact': 0,
     'Rew_disway_fact': 0.01,
     'Rew_step_fact': 0,
-    'Rew_tardis_fact': 100,
+    'Rew_direct_fact': 100,
     'Rew_angvel_fact': 10,
     'Rew_collision': -100,
     'Rew_terminated': 1000,
@@ -40,7 +40,7 @@ parameters = {
     'Total_timesteps': int(1.5e6),
     'train_freq': 1,
     'gradient_steps': -1,
-    'target_update_interval': 240*30,
+    'target_update_interval': 10,
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
     'parent_model': "none"
 }

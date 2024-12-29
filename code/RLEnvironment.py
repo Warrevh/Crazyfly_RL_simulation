@@ -32,7 +32,7 @@ class RLEnvironment(BaseRLAviary):
         self.Rew_distrav_fact = parameters['Rew_distrav_fact']
         self.Rew_disway_fact = parameters['Rew_disway_fact']
         self.Rew_step_fact = parameters['Rew_step_fact']
-        self.Rew_tardis_fact = parameters['Rew_tardis_fact']
+        self.Rew_direct_fact = parameters['Rew_direct_fact']
         self.Rew_angvel_fact = parameters['Rew_angvel_fact']
         self.Rew_colision = parameters['Rew_collision']
         self.Rew_terminated = parameters['Rew_terminated']
@@ -108,7 +108,7 @@ class RLEnvironment(BaseRLAviary):
         ret = (-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2])) #negative reward for distance travelled
                +self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #positive reward for distance to target
                -self.Rew_step_fact*1 #-1 each step
-               +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis) #positive if moved in direction of target
+               +self.Rew_direct_fact*(prev_tar_dis-self.target_dis) #positive if moved in direction of target
                -self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2))) #negative reward for changes in angular velocity
 
          
