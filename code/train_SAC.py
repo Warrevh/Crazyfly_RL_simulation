@@ -49,7 +49,7 @@ class Train_SAC():
         n_actions = train_env.action_space.shape
         action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=1 * np.ones(n_actions),theta=0.10, dt=1)
 
-        
+        """
         model = SAC.load("results/SAC_save-12.24.2024_00.37.24/final_model.zip",train_env)
         """
         model = SAC('MultiInputPolicy',train_env,
@@ -59,7 +59,7 @@ class Train_SAC():
                     train_freq= (int(1), "step"), #int(eval_env.CTRL_FREQ//2)
                     replay_buffer_class= DictReplayBuffer,
                     verbose=1)
-        """
+        
         
         target_reward = self.parameters['Target_reward']
 
