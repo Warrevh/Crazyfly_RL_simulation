@@ -76,7 +76,7 @@ rewards = []
 
 for i in range(10000):
 
-    action = np.array([[-1,-1]]) #getAction._getRandomAction()#np.array([[1,0]]) #getAction._getActionSquare(i)
+    action = np.array([[-1,0]]) #getAction._getRandomAction()#np.array([[1,0]]) #getAction._getActionSquare(i)
     """
     if i < 5000:
          action = np.array([[1,0]])
@@ -113,12 +113,12 @@ state = env._observationSpace()
 print(action)
 print(state)
 
-x_positions = [obs[7] for obs in all_obs]
-steps = list(range(1, len(rewards) + 1))  # x-axis: steps (1 to the length of speed)
+x_positions = [obs[3] for obs in all_obs]
+steps = list(range(1, len(x_positions) + 1))  # x-axis: steps (1 to the length of speed)
 
 # Create the plot
 plt.figure(figsize=(8, 5))
-plt.plot(steps, rewards, marker='o', linestyle='-', color='blue', label='Speed over Steps')
+plt.plot(steps, x_positions, marker='o', linestyle='-', color='blue', label='Speed over Steps')
 
 # Add labels and title
 plt.xlabel('Steps')

@@ -11,10 +11,11 @@ parameters = {
     'Target_pos': np.array([2.5,2,0.2]),
     'episode_length': 30,
     #Learning
-    'Learning_rate': 0.0001,
+    'Learning_rate': 0.001,
     'learning_starts': 10000,
     'batch_size':1000,
     'use_sde':True ,
+    'sde_sample_freq': 1,
     #Reward
     'Target_reward': 1500,
     #Reward Function
@@ -35,10 +36,11 @@ parameters = {
     'ang_v': True, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     'prev_act':False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     #train
-    'number_of_env': 6,
-    'Total_timesteps': int(6e6),
+    'number_of_env': 1,
+    'Total_timesteps': int(1.5e6),
     'train_freq': 1,
     'gradient_steps': -1,
+    'target_update_interval': 240*30,
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
     'parent_model': "none"
 }

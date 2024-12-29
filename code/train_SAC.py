@@ -60,6 +60,8 @@ class Train_SAC():
                     train_freq= (int(self.parameters['train_freq']), "step"), #int(eval_env.CTRL_FREQ//2)
                     gradient_steps=self.parameters['gradient_steps'],
                     use_sde=self.parameters['use_sde'],
+                    sde_sample_freq=self.parameters['sde_sample_freq'],
+                    target_update_interval=self.parameters['target_update_interval'],
                     verbose=1)
         
         
