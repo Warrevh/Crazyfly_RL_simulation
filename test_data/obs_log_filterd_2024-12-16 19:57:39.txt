@@ -1,1 +1,0 @@
-Position_x,Position_y,Position_z,Velocity_x,Velocity_y,Velocity_z,Roll,Pitch,Yaw,AngularVelocity_x,AngularVelocity_y,AngularVelocity_z
