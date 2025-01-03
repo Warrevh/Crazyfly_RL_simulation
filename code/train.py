@@ -1,6 +1,8 @@
 import numpy as np
 from train_DDPG import Train_DDPG
 from train_SAC import Train_SAC
+from train_TD3 import Train_TD3
+from train_PPO import Train_PPO
 
 parameters = {
     #env parameters
@@ -9,13 +11,13 @@ parameters = {
     'obs_noise': True,
     'ctrl_freq': 240,
     'Target_pos': np.array([2.5,2,0.2]),
-    'episode_length': 30,
+    'episode_length': 60,
     #Learning
     'Learning_rate': 0.001,
-    'learning_starts': 10000,
-    'batch_size':1000,
-    'use_sde':True ,
-    'sde_sample_freq': 1,
+    'learning_starts': 100000,
+    'batch_size':256,
+    'use_sde':False ,
+    'sde_sample_freq': -1,
     #Reward
     'Target_reward': 1500,
     #Reward Function
@@ -37,7 +39,7 @@ parameters = {
     'prev_act':False, #!!!!!!! ADJUST MANUALY IN CODE !!!!!!!
     #train
     'number_of_env': 1,
-    'Total_timesteps': int(1.5e6),
+    'Total_timesteps': int(3e6),
     'train_freq': 1,
     'gradient_steps': -1,
     'target_update_interval': 10,
@@ -46,7 +48,11 @@ parameters = {
 }
 
 #DDPG = Train_DDPG(parameters=parameters,train_gui=False)
+#TD3 = Train_TD3(parameters=parameters,train_gui=False)
+#PPO = Train_PPO(parameters=parameters,train_gui=False)
 SAC = Train_SAC(parameters=parameters,train_gui=False)
 
 #DDPG.train_DDPG()
+#TD3.train_TD3()
+#PPO.train_PPO()
 SAC.train_SAC()

@@ -5,7 +5,7 @@ import torch
 from datetime import datetime
 import csv
 
-from stable_baselines3 import DDPG,SAC
+from stable_baselines3 import DDPG,TD3
 
 
 class Txt_File:
@@ -35,7 +35,7 @@ class Plot:
         model_type_ = model_type + '_model.zip'
         filename = os.path.join(self.file, model_type_)
 
-        model = SAC.load(filename)
+        model = TD3.load(filename)
 
         critic = model.policy.critic
         actor = model.policy.actor
