@@ -47,22 +47,21 @@ class Train_DDPG():
         print('[INFO] Observation space:', train_env.observation_space)
 
         n_actions = train_env.action_space.shape
-        action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=1 * np.ones(n_actions),theta=0.10, dt=1)
+        action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=1/3 * np.ones(n_actions))
 
-        def lineair_decay(progress_remaining):
-            progress_remaining
-            return self.parameters['Learning_rate'] * np.exp(self.parameters['Learning_rate_decay'] * progress_remaining)
 
         """
-        model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip",train_env)
+        model = DDPG.load("results/DDPG_save-12.08.2024_23.19.52/final_model.zip",train_env)
         """
         model = DDPG('MultiInputPolicy',train_env,
                     learning_rate=self.parameters['Learning_rate'],
-                    learning_starts=1,
+                    learning_starts=self.parameters['learning_starts'],
+                    batch_size=self.parameters['batch_size'],
                     action_noise=action_noise,
-                    train_freq= (int(1), "step"), #int(eval_env.CTRL_FREQ//2)
-                    replay_buffer_class= DictReplayBuffer,
+                    train_freq= (int(self.parameters['train_freq']), "step"), #int(eval_env.CTRL_FREQ//2)
+                    gradient_steps=self.parameters['gradient_steps'],
                     verbose=1)
+    
 
         target_reward = self.parameters['Target_reward']
 
@@ -71,7 +70,7 @@ class Train_DDPG():
         eval_callback = EvalCallback(eval_env,
                                         callback_on_new_best=callback_on_best,
                                         verbose=1,
-                                        n_eval_episodes= 2,
+                                        n_eval_episodes= self.parameters['eval_episodes'],
                                         best_model_save_path=self.filename+'/',
                                         log_path=self.filename+'/',
                                         eval_freq=self.eval_freq,

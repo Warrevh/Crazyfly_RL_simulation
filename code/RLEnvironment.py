@@ -27,15 +27,19 @@ class RLEnvironment(BaseRLAviary):
         
         self.INITIAL_XYZS = parameters['initial_xyzs'] #np.array([[4.5,3.5,0.2]]) #np.array([[-1.5,-1.5,0.2]])
         self.Random_initial_pos = parameters['random_initial_pos']
+        self.obs_noise = parameters['obs_noise']
         self.CTRL_FREQ = parameters['ctrl_freq']
         self.Rew_distrav_fact = parameters['Rew_distrav_fact']
         self.Rew_disway_fact = parameters['Rew_disway_fact']
         self.Rew_step_fact = parameters['Rew_step_fact']
-        self.Rew_tardis_fact= parameters['Rew_tardis_fact']
+        self.Rew_direct_fact = parameters['Rew_direct_fact']
+        self.Rew_angvel_fact = parameters['Rew_angvel_fact']
         self.Rew_colision = parameters['Rew_collision']
         self.Rew_terminated = parameters['Rew_terminated']
 
-        self.act2d = True
+        self.act2d = True #actionspace is 2D
+
+        self.Original_initialXYZS = np.copy(self.INITIAL_XYZS)
 
         self.waypoint = False
         self.smallWaypoints_POS = np.array([[1,0.5,0.2],[2,0.5,0.2]])
@@ -61,8 +65,11 @@ class RLEnvironment(BaseRLAviary):
         
         self.EPISODE_LEN_SEC = parameters['episode_length']
         
-        self.reward_state = self._getDroneStateVector(0)[0:2]
-        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-self._getDroneStateVector(0)[0:2])
+        state_vector = self._getDroneStateVector(0)
+
+        self.reward_state = state_vector[0:2]
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-state_vector[0:2])
+        self.angvel = state_vector[13:16]
 
     def step(self,action):
 
@@ -86,17 +93,24 @@ class RLEnvironment(BaseRLAviary):
         return super().reset(seed,options)
 
     def _computeReward(self):
+
+        state_vector = self._getDroneStateVector(0)
        
         prev_state = self.reward_state[0:2]
-        self.reward_state = self._getDroneStateVector(0)[0:2]
+        self.reward_state = state_vector[0:2]
 
         prev_tar_dis = self.target_dis
-        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-self._getDroneStateVector(0)[0:2])
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-state_vector[0:2])
+
+        prev_angvel = self.angvel
+        self.angvel = state_vector[13:16]
 
         ret = (-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2])) #negative reward for distance travelled
-               -self.Rew_disway_fact*(np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #negative reward for distance to target
+               +self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4) #positive reward for distance to target
                -self.Rew_step_fact*1 #-1 each step
-               +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)) #positive if moved in direction of target
+               +self.Rew_direct_fact*(prev_tar_dis-self.target_dis) #positive if moved in direction of target
+               -self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2))) #negative reward for changes in angular velocity
+
          
         if self._getCollision(self.DRONE_IDS[0]):
             ret = self.Rew_colision #reward for hitting wall
@@ -252,14 +266,14 @@ class RLEnvironment(BaseRLAviary):
             lo = -np.inf
             hi = np.inf
 
-            pos_lo = np.array([[-5,-5,0] for i in range(self.NUM_DRONES)])
-            pos_hi = np.array([[5,5,3] for i in range(self.NUM_DRONES)])
-            vel_lo = np.array([[-1,-1,-1] for i in range(self.NUM_DRONES)])
-            vel_hi = np.array([[1,1,1] for i in range(self.NUM_DRONES)])
-            rpy_lo = np.array([[-np.pi,-np.pi,-np.pi] for i in range(self.NUM_DRONES)])
-            rpy_hi = np.array([[np.pi,np.pi,np.pi] for i in range(self.NUM_DRONES)])
-            ang_v_lo = np.array([[-2,-2,-2] for i in range(self.NUM_DRONES)])
-            ang_v_hi = np.array([[2,2,2] for i in range(self.NUM_DRONES)])
+            pos_lo = np.array([[0,0,0] for i in range(self.NUM_DRONES)])
+            pos_hi = np.array([[5,4,0.5] for i in range(self.NUM_DRONES)])
+            vel_lo = np.array([[-0.7,-0.7,-0.7] for i in range(self.NUM_DRONES)])
+            vel_hi = np.array([[0.7,0.7,0.7] for i in range(self.NUM_DRONES)])
+            rpy_lo = np.array([[-0.17,-0.17,-0.17] for i in range(self.NUM_DRONES)])
+            rpy_hi = np.array([[0.17,0.17,0.17] for i in range(self.NUM_DRONES)])
+            ang_v_lo = np.array([[-1.8,-1.8,-1.8] for i in range(self.NUM_DRONES)])
+            ang_v_hi = np.array([[1.8,1.8,1.8] for i in range(self.NUM_DRONES)])
 
             act_lo = -1
             act_hi = +1
@@ -308,6 +322,15 @@ class RLEnvironment(BaseRLAviary):
             for i in range(self.ACTION_BUFFER_SIZE):
                 ret = np.hstack([ret, np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])])
             """
+            if self.obs_noise:
+                noise_vel = np.random.normal(0, 0.005, size=3)
+                noise_rpy = np.random.normal(0, 0.00025, size=3)
+                noise_ang_v = np.random.normal(0, 0.1, size=3)
+            else:
+                noise_vel = np.zeros([3])
+                noise_rpy = np.zeros([3])
+                noise_ang_v = np.zeros([3])
+
             pos = np.zeros((self.NUM_DRONES,3))
             vel = np.zeros((self.NUM_DRONES,3))
             rpy = np.zeros((self.NUM_DRONES,3))
@@ -315,9 +338,9 @@ class RLEnvironment(BaseRLAviary):
             for i in range(self.NUM_DRONES):
                 obs = self._getDroneStateVector(i)
                 pos[i,:]=obs[0:3]
-                vel[i,:]=obs[10:13]
-                rpy[i,:]=obs[7:10]
-                ang_v[i,:]=obs[13:16]
+                vel[i,:]=obs[10:13]+noise_vel
+                rpy[i,:]=obs[7:10]+noise_rpy
+                ang_v[i,:]=obs[13:16]+noise_ang_v
                 
             act = np.empty((0, 2))
             for i in range(self.ACTION_BUFFER_SIZE):
@@ -344,7 +367,7 @@ class RLEnvironment(BaseRLAviary):
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
 
-        p.resetBasePositionAndOrientation(self.DRONE_IDS[0], self.INIT_XYZS[0,:],p.getQuaternionFromEuler(self.INIT_RPYS[0,:]), physicsClientId=self.CLIENT)
+        p.resetBasePositionAndOrientation(self.DRONE_IDS[0], self.INITIAL_XYZS[0,:],p.getQuaternionFromEuler(self.INIT_RPYS[0,:]), physicsClientId=self.CLIENT)
         p.resetBaseVelocity(self.DRONE_IDS[0],self.vel[0,:],self.ang_v[0,:], physicsClientId=self.CLIENT)
 
         self.ctrl[0].reset()
@@ -362,18 +385,11 @@ class RLEnvironment(BaseRLAviary):
         return False
     
     def get_Random_inital_pos(self):
-        step_size = 0.1
-        min_position = 0.5
-        max_position = 4.5
-
-        position = self.INIT_XYZS[0,0]
-
-        direction = np.random.choice([-1, 1])
-        step = step_size*direction
-        position += step #allong x-axis
-       
-        position = np.clip(position, min_position, max_position)
-        self.INIT_XYZS[0,0] = position
+        radius = 0.2
+        r = np.sqrt(np.random.uniform(0, 1)) * radius
+        theta = np.random.uniform(0, 2 * np.pi)
+        self.INITIAL_XYZS[0,0] = r * np.cos(theta) + self.Original_initialXYZS[0,0]
+        self.INITIAL_XYZS[0,1] = r * np.sin(theta) + self.Original_initialXYZS[0,1]
 
 class getAction():
 
