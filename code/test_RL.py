@@ -55,7 +55,7 @@ parameters = {
 
 test_env = RLEnvironment( parameters=parameters ,gui=True )
 
-folder = "results\TD3_save-12.30.2024_13.54.04"
+folder = "results/TD3_save-01.07.2025_16.13.26"
 
 #model = TD3.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip")
 #model = TD3.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
@@ -67,7 +67,7 @@ log = Logger_obs(folder)
 
 mean_reward, std_reward = evaluate_policy(model,
                                             test_env,
-                                            n_eval_episodes=5
+                                            n_eval_episodes=1
                                             )
 print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
 

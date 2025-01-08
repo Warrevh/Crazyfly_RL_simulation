@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import os
 import torch
 from datetime import datetime
 import csv
+import pickle
 
 from stable_baselines3 import TD3
 
@@ -226,3 +228,88 @@ class Plot_obs():
     # Function to get the corresponding column index
     def get_column_index(self,name):
         return self.column_indices.get(name, "Invalid name")
+    
+class Plot_muliple_runs():
+    def __init__(self,file):
+        self.file = file
+
+        with open(self.file, 'rb') as f:
+            self.data_all_runs = pickle.load(f)
+
+        self.number_of_runs = len(self.data_all_runs)
+
+    def x_y_pos_one_run(self,arr):
+        pos_x_one_run = []
+        pos_y_one_run = []
+        for d in arr:
+            obs_array = d["obs"]
+            pos_x = obs_array[0]
+            pos_y = obs_array[1]
+            pos_x_one_run.append(pos_x)
+            pos_y_one_run.append(pos_y)
+
+        return pos_x_one_run,pos_y_one_run
+
+    def best_reward_arr(self):
+        best_array = None
+        best_reward = float('-inf')
+
+        for arr in self.data_all_runs:
+            total_reward_ep = sum(d["reward"] for d in arr)
+            
+            if total_reward_ep > best_reward:
+                best_reward = total_reward_ep
+                best_array = arr
+        
+        return best_array
+    
+    def shortest_arr(self):
+        shortest_array = None
+        shortest_length = float('inf')
+        
+        for arr in self.data_all_runs:
+            array_length = len(arr)
+            
+            if array_length < shortest_length:
+                shortest_length = array_length
+                shortest_array = arr
+        return shortest_array
+    
+    def plot_xy_positions(self):
+        plt.figure(figsize=(8, 5))
+
+        for arr in self.data_all_runs:
+            pos_x,pos_y = self.x_y_pos_one_run(arr)
+            plt.plot(pos_x, pos_y, linestyle='-', color='red', alpha=0.1)
+
+        pos_x,pos_y = self.x_y_pos_one_run(self.best_reward_arr())
+        plt.plot(pos_x, pos_y, linestyle='-', color='green', alpha=0.9, label= "Best reward" )
+
+        # Add labels and title
+        plt.xlabel('x(m)')
+        plt.ylabel('y(m)')
+        plt.title(f'Path of {self.number_of_runs} runs ')
+        plt.legend()
+        plt.grid(True)
+
+        # Show the plot
+        plt.show()
+
+    def plot_distribution_return(self):
+        return_ep = []
+
+        for arr in self.data_all_runs:
+            return_ep.append(sum(d["reward"] for d in arr))
+
+        plt.figure(figsize=(8, 6))
+        sns.histplot(return_ep, kde=True, bins=50, color='blue', edgecolor='black')
+
+        # Add labels and title
+        plt.xlabel('Return', fontsize=12)
+        plt.ylabel('Frequency', fontsize=12)
+        plt.title(f'Distribution of Return for {self.number_of_runs} runs', fontsize=14)
+
+        # Show the plot
+        plt.show()
+
+

@@ -90,7 +90,15 @@ class RLEnvironment(BaseRLAviary):
 
         self.ctrl[0].reset()
 
-        return super().reset(seed,options)
+        obs, info = super().reset(seed,options)
+
+        #"resets" the variables used for calculating the reward.
+        state_vector = self._getDroneStateVector(0)
+        self.reward_state = state_vector[0:2]
+        self.target_dis = np.linalg.norm(self.TARGET_POS[0:2]-state_vector[0:2])
+        self.angvel = state_vector[13:16]
+
+        return obs, info
 
     def _computeReward(self):
 
@@ -115,6 +123,7 @@ class RLEnvironment(BaseRLAviary):
         if self._getCollision(self.DRONE_IDS[0]):
             ret = self.Rew_colision #reward for hitting wall
         elif self._computeTerminated():
+            print("Terminated")
             ret = self.Rew_terminated #reward for reaching target
         elif self.waypoint and self.hit_waypoint():
             ret = 100 #reward for reaching waypoint
@@ -125,7 +134,6 @@ class RLEnvironment(BaseRLAviary):
 
         state = self._getDroneStateVector(0)
         if np.linalg.norm(self.TARGET_POS[0:2]-state[0:2]) < self.TARGET_RAD:
-            print("Terminated")
             Terminated = True
         else:
             Terminated = False
