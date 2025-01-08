@@ -57,7 +57,7 @@ class Multiple_runs():
             self.all_runs_data.append(self.one_run())
             print("epsisode:", i)
 
-        self.save_data()
+        #self.save_data()
         return(self.all_runs_data)
 
     def save_data(self):
@@ -109,9 +109,14 @@ parameters = {
 }
 path = 'results/TD3_save-01.07.2025_16.13.26'
 model_type = 'best'
-n_runs = 50
+n_runs = 5
 runs = Multiple_runs(n_runs, parameters, path, model_type)
-runs.all_runs()
+test = runs.all_runs()
+
+for arr in test:
+    if arr[-1]["terminated"]:
+        endpoint = [arr[-1]["obs"][0],arr[-1]["obs"][1]]
+        print(endpoint)
 
 """
 print(test)

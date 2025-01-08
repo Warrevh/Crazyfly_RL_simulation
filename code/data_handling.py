@@ -6,6 +6,8 @@ import torch
 from datetime import datetime
 import csv
 import pickle
+import pandas as pd
+
 
 from stable_baselines3 import TD3
 
@@ -230,13 +232,25 @@ class Plot_obs():
         return self.column_indices.get(name, "Invalid name")
     
 class Plot_muliple_runs():
-    def __init__(self,file):
-        self.file = file
+    def __init__(self,file1, file2 = None, file3 = None):
+        self.target = np.array([2.5,2])
 
-        with open(self.file, 'rb') as f:
-            self.data_all_runs = pickle.load(f)
+        self.file1 = file1
+        self.file2 = file2
+        self.file3 = file3
 
-        self.number_of_runs = len(self.data_all_runs)
+        with open(self.file1, 'rb') as f:
+            self.data_all_runs1 = pickle.load(f)
+        
+        with open(self.file2, 'rb') as f:
+            self.data_all_runs2 = pickle.load(f)
+
+        with open(self.file3, 'rb') as f:
+            self.data_all_runs3 = pickle.load(f)
+
+        
+
+        self.number_of_runs = len(self.data_all_runs1)
 
     def x_y_pos_one_run(self,arr):
         pos_x_one_run = []
@@ -254,7 +268,7 @@ class Plot_muliple_runs():
         best_array = None
         best_reward = float('-inf')
 
-        for arr in self.data_all_runs:
+        for arr in self.data_all_runs1:
             total_reward_ep = sum(d["reward"] for d in arr)
             
             if total_reward_ep > best_reward:
@@ -267,7 +281,7 @@ class Plot_muliple_runs():
         shortest_array = None
         shortest_length = float('inf')
         
-        for arr in self.data_all_runs:
+        for arr in self.data_all_runs1:
             array_length = len(arr)
             
             if array_length < shortest_length:
@@ -278,7 +292,7 @@ class Plot_muliple_runs():
     def plot_xy_positions(self):
         plt.figure(figsize=(8, 5))
 
-        for arr in self.data_all_runs:
+        for arr in self.data_all_runs1:
             pos_x,pos_y = self.x_y_pos_one_run(arr)
             plt.plot(pos_x, pos_y, linestyle='-', color='red', alpha=0.1)
 
@@ -298,7 +312,7 @@ class Plot_muliple_runs():
     def plot_distribution_return(self):
         return_ep = []
 
-        for arr in self.data_all_runs:
+        for arr in self.data_all_runs1:
             return_ep.append(sum(d["reward"] for d in arr))
 
         plt.figure(figsize=(8, 6))
@@ -311,5 +325,76 @@ class Plot_muliple_runs():
 
         # Show the plot
         plt.show()
+
+    def plot_boxplot(self):
+        return_ep1 = []
+        return_ep2 = []
+        return_ep3 = []
+
+        for arr in self.data_all_runs1:
+            return_ep1.append(sum(d["reward"] for d in arr))
+
+        for arr in self.data_all_runs2:
+            return_ep2.append(sum(d["reward"] for d in arr))
+
+        for arr in self.data_all_runs3:
+            return_ep3.append(sum(d["reward"] for d in arr))
+
+        data = {
+            "Dataset": ["DDPG"] * len(return_ep1) + ["TD3"] * len(return_ep2) + ["SAC"] * len(return_ep3),
+            "Values": return_ep1 + return_ep2 + return_ep3,
+        }
+        df = pd.DataFrame(data)
+
+        plt.figure(figsize=(8, 6))
+        sns.boxplot(x="Dataset", y="Values", data=df, palette="pastel")
+
+        plt.title("Boxplot of DDPG,TD3 and SAC", fontsize=14)
+        plt.xlabel("Algorithm", fontsize=12)
+        plt.ylabel("Return", fontsize=12)
+
+        # Show the plot
+        plt.show()
+
+    def plot_distribution_endpoint(self):
+        dis_endpoints_to_target = []
+
+        for arr in self.data_all_runs1:
+            if arr[-1]["terminated"]:
+                dis_endpoints_to_target.append(self.calculate_distotarget(arr[-1]))
+            elif arr[-1]["truncated"]:
+                dis_endpoints_to_target.append(self.shortes_distotarget(arr))
+            else: 
+                print("error")
+                dis_endpoints_to_target.append(None)
+
+        plt.figure(figsize=(8, 6))
+        sns.histplot(dis_endpoints_to_target, kde=True, bins=50, color='blue', edgecolor='black')
+
+        # Add labels and title
+        plt.xlabel('Distance', fontsize=12)
+        plt.ylabel('Frequency', fontsize=12)
+        plt.title(f'Distribution of distance from target for {self.number_of_runs} runs', fontsize=14)
+
+        # Show the plot
+        plt.show()
+
+    def calculate_distotarget(self,d):
+        endpoint = np.array([d["obs"][0],d["obs"][1]])
+        distance = np.linalg.norm(self.target-endpoint)
+        return distance
+    
+    def shortes_distotarget(self,arr):
+        shortest_distance = float('inf')
+        
+        for d in arr:
+            dis = self.calculate_distotarget(d)
+            if  dis < shortest_distance:
+                shortest_distance = dis
+        return shortest_distance
+
+
+
+
 
 

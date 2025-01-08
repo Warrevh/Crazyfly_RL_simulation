@@ -17,7 +17,12 @@ plot_obs.plot_multiple_value(["AngularVelocity_x","AngularVelocity_y","AngularVe
 plot_obs.plot_xy_position()
 """
 
-file = "results/TD3_save-01.07.2025_16.13.26/data_50_runs_with_best_model_01.08.2025_19.02.21.pkl"
-plot_multiple = Plot_muliple_runs(file)
+file1 = "results/TD3_save-01.07.2025_16.13.26/data_50_runs_with_best_model_01.08.2025_19.02.21.pkl"
+file2 = "results/TD3_save-01.07.2025_16.13.26/data_50_runs_with_best_model_01.08.2025_19.02.21.pkl"
+file3 = "results/TD3_save-01.07.2025_16.13.26/data_50_runs_with_best_model_01.08.2025_19.02.21.pkl"
+
+plot_multiple = Plot_muliple_runs(file1,file2,file3)
 plot_multiple.plot_xy_positions()
 plot_multiple.plot_distribution_return()
+plot_multiple.plot_distribution_endpoint()
+plot_multiple.plot_boxplot()
