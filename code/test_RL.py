@@ -3,7 +3,7 @@ import numpy as np
 
 from gym_pybullet_drones.utils.utils import sync
 
-from stable_baselines3 import DDPG, SAC
+from stable_baselines3 import TD3
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from RLEnvironment import RLEnvironment
@@ -55,13 +55,13 @@ parameters = {
 
 test_env = RLEnvironment( parameters=parameters ,gui=True )
 
-folder = "results\SAC_save-01.02.2025_22.55.34"
+folder = "results\TD3_save-12.30.2024_13.54.04"
 
-#model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip")
-#model = DDPG.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
-#model = DDPG.load("results/trained big box save-11.20.2024_21.19.39/final_model.zip")
-#model = DDPG.load("results/trained big box save-11.20.2024_21.19.39/best_model.zip")
-model = SAC.load(str(folder+f"/final_model"))
+#model = TD3.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip")
+#model = TD3.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
+#model = TD3.load("results/trained big box save-11.20.2024_21.19.39/final_model.zip")
+#model = TD3.load("results/trained big box save-11.20.2024_21.19.39/best_model.zip")
+model = TD3.load(str(folder+f"/best_model"))
 
 log = Logger_obs(folder)
 

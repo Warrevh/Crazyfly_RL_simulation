@@ -42,18 +42,16 @@ parameters = {
     'Total_timesteps': int(3e6),
     'train_freq': 1,
     'gradient_steps': -1,
-    'target_update_interval': 10,
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
     'parent_model': "none"
-
 }
 
 #DDPG = Train_DDPG(parameters=parameters,train_gui=False)
-#TD3 = Train_TD3(parameters=parameters,train_gui=False)
+TD3 = Train_TD3(parameters=parameters,train_gui=False)
 #PPO = Train_PPO(parameters=parameters,train_gui=False)
-SAC = Train_SAC(parameters=parameters,train_gui=False)
+#SAC = Train_SAC(parameters=parameters,train_gui=False)
 
 #DDPG.train_DDPG()
-#TD3.train_TD3()
+TD3.train_TD3()
 #PPO.train_PPO()
-SAC.train_SAC()
+#SAC.train_SAC()
