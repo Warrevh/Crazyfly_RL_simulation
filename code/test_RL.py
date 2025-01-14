@@ -9,6 +9,8 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from RLEnvironment import RLEnvironment
 from data_handling import Logger_obs
 
+#used for testing the models
+
 parameters = {
     #env parameters
     'initial_xyzs': np.array([[4.5,3.5,0.2]]),
@@ -55,12 +57,10 @@ parameters = {
 
 test_env = RLEnvironment( parameters=parameters ,gui=True )
 
-folder = "results/TD3_save-01.07.2025_16.13.26"
+#model to test
+folder = "results/TD3_save-01.09.2025_11.27.47"
 
-#model = TD3.load("results/trained big box 2.0 save-11.21.2024_23.05.24/final_model.zip")
-#model = TD3.load("results/trained big box 2.0 save-11.21.2024_23.05.24/best_model.zip")
-#model = TD3.load("results/trained big box save-11.20.2024_21.19.39/final_model.zip")
-#model = TD3.load("results/trained big box save-11.20.2024_21.19.39/best_model.zip")
+#type of model: best or final
 model = TD3.load(str(folder+f"/best_model"))
 
 log = Logger_obs(folder)

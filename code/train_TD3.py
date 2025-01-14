@@ -49,9 +49,12 @@ class Train_TD3():
         n_actions = train_env.action_space.shape
         action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=1/3 * np.ones(n_actions))
 
+        #for training from an older model
         """"
         model = TD3.load("results/SAC_save-12.24.2024_18.07.36/final_model.zip",train_env)
         """
+
+        #for training from new model
         model = TD3('MultiInputPolicy',train_env,
                     learning_rate=self.parameters['Learning_rate'],
                     learning_starts=self.parameters['learning_starts'],

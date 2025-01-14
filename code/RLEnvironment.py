@@ -8,6 +8,7 @@ from gym_pybullet_drones.envs.BaseRLAviary import BaseRLAviary
 from gym_pybullet_drones.utils.enums import DroneModel, Physics, ActionType, ObservationType, ImageType
 from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 
+#environment
 
 class RLEnvironment(BaseRLAviary):
 
@@ -41,7 +42,7 @@ class RLEnvironment(BaseRLAviary):
 
         self.Original_initialXYZS = np.copy(self.INITIAL_XYZS)
 
-        self.waypoint = False
+        self.waypoint = False #tot turn on waypoints or not
         self.smallWaypoints_POS = np.array([[1,0.5,0.2],[2,0.5,0.2]])
         self.smallWaypoint_RAD = 0.1 
 
@@ -159,14 +160,6 @@ class RLEnvironment(BaseRLAviary):
             print("Timeout")
             Truncated = True
 
-    
-        
-            """
-        if self._getCollision(self.DRONE_IDS[0]):
-
-            print("collision")
-            return True
-            """
         
         else:
             Truncated = False
@@ -200,6 +193,7 @@ class RLEnvironment(BaseRLAviary):
             self.hit_smallWaypoints_IDs = self.smallWaypoints_IDs
 
         self.TARGET_ID = createWaypoint._makeTarget(self.TARGET_POS,self.TARGET_RAD,self.CLIENT)
+        #self.START_ID = createWaypoint._makeStart([4.5,3.5,0.2],0.2,self.CLIENT) #visualize the start position
         
     def _getCollision(self,obj1):
 
@@ -242,35 +236,16 @@ class RLEnvironment(BaseRLAviary):
         
         act_lower_bound = np.array([-1*np.ones(size) for i in range(self.NUM_DRONES)])
         act_upper_bound = np.array([+1*np.ones(size) for i in range(self.NUM_DRONES)])
-        #
+        
         for i in range(self.ACTION_BUFFER_SIZE):
             self.action_buffer.append(np.zeros((self.NUM_DRONES,size)))
-        #
+        
         return spaces.Box(low=act_lower_bound, high=act_upper_bound, dtype=np.float32)
 
     def _observationSpace(self):
 
         if self.OBS_TYPE == ObservationType.KIN and self.ACT_TYPE ==ActionType.PID and self.act2d == True:
-            """
-            ############################################################
-            #### OBS SPACE OF SIZE 12
-            #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ
-            lo = -np.inf
-            hi = np.inf
-            obs_lower_bound = np.array([[-5,-5,0, lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)]) #np.array([[-5,-5,0, lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
-            obs_upper_bound = np.array([[5,5,5,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)]) #np.array([[5,5,5,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
-            #### Add action buffer to observation space ################
-            
-            act_lo = -1
-            act_hi = +1
-            for i in range(self.ACTION_BUFFER_SIZE):
-                obs_lower_bound = np.hstack([obs_lower_bound, np.array([[act_lo,act_lo] for i in range(self.NUM_DRONES)])])
-                obs_upper_bound = np.hstack([obs_upper_bound, np.array([[act_hi,act_hi] for i in range(self.NUM_DRONES)])])
-            
-            return spaces.Box(low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32)
-            
-            ############################################################
-            """
+           
             lo = -np.inf
             hi = np.inf
 
@@ -292,7 +267,7 @@ class RLEnvironment(BaseRLAviary):
                 act_upper_bound = np.append(act_upper_bound,np.array([[act_hi,act_hi] for i in range(self.NUM_DRONES)]),axis=0)
 
 
-
+            #(un)comment to add/remove data from observation space
             ret = spaces.Dict({
                 "Position": spaces.Box(low=pos_lo, high=pos_hi,dtype=np.float32),
                 "Velocity": spaces.Box(low=vel_lo, high=vel_hi,dtype=np.float32),
@@ -317,19 +292,6 @@ class RLEnvironment(BaseRLAviary):
 
         if self.OBS_TYPE == ObservationType.KIN and self.ACT_TYPE ==ActionType.PID and self.act2d == True:
 
-            """
-            ############################################################
-            #### OBS SPACE OF SIZE 12
-            obs_12 = np.zeros((self.NUM_DRONES,12))
-            for i in range(self.NUM_DRONES):
-                #obs = self._clipAndNormalizeState(self._getDroneStateVector(i))
-                obs = self._getDroneStateVector(i)
-                obs_12[i, :] = np.hstack([obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,) #[obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,)
-            ret = np.array([obs_12[i, :] for i in range(self.NUM_DRONES)]).astype('float32')
-            
-            for i in range(self.ACTION_BUFFER_SIZE):
-                ret = np.hstack([ret, np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])])
-            """
             if self.obs_noise:
                 noise_vel = np.random.normal(0, 0.005, size=3)
                 noise_rpy = np.random.normal(0, 0.00025, size=3)
@@ -354,6 +316,7 @@ class RLEnvironment(BaseRLAviary):
             for i in range(self.ACTION_BUFFER_SIZE):
                 act = np.append(act,np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)]),axis=0)
 
+            #(un)comment to add/remove data from observation space
             ret = {
                 "Position": np.array([pos[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
                 "Velocity": np.array([vel[i,:] for i in range(self.NUM_DRONES)]).astype('float32'),
@@ -393,6 +356,8 @@ class RLEnvironment(BaseRLAviary):
         return False
     
     def get_Random_inital_pos(self):
+
+        #randomize inital positon within a cirkel 
         radius = 0.2
         r = np.sqrt(np.random.uniform(0, 1)) * radius
         theta = np.random.uniform(0, 2 * np.pi)
@@ -400,7 +365,7 @@ class RLEnvironment(BaseRLAviary):
         self.INITIAL_XYZS[0,1] = r * np.sin(theta) + self.Original_initialXYZS[0,1]
 
 class getAction():
-
+    #used for testing in the test code
     def _getRandomAction():
         action = np.random.uniform(-1, 1, size=(1, 2))
 
@@ -444,7 +409,21 @@ class createWaypoint():
 
         visual_id = p.createVisualShape(shapeType=p.GEOM_SPHERE,
                                     radius=radius,
-                                    rgbaColor=[0, 1, 0, 0.3],
+                                    rgbaColor=[0, 1, 0, 0.5],
+                                    visualFramePosition=[0,0,0],
+                                    physicsClientId=CLIENT)
+        
+        body_id = p.createMultiBody(
+                      baseVisualShapeIndex=visual_id,
+                      basePosition = pos,
+                      physicsClientId=CLIENT)
+        return body_id
+    
+    def _makeStart(pos,radius,CLIENT):
+
+        visual_id = p.createVisualShape(shapeType=p.GEOM_SPHERE,
+                                    radius=radius,
+                                    rgbaColor=[1, 0, 0, 0.5],
                                     visualFramePosition=[0,0,0],
                                     physicsClientId=CLIENT)
         

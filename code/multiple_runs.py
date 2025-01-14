@@ -6,6 +6,7 @@ import os
 
 from RLEnvironment import RLEnvironment
 
+#for running the model multiple episodes and collecting data
 class Multiple_runs():
     def __init__(self,n_runs, env_parameters, store_path, model_type):
         self.n_runs = n_runs
@@ -57,7 +58,7 @@ class Multiple_runs():
             self.all_runs_data.append(self.one_run())
             print("epsisode:", i)
 
-        #self.save_data()
+        self.save_data()
         return(self.all_runs_data)
 
     def save_data(self):
@@ -107,30 +108,8 @@ parameters = {
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
     'parent_model': "none"
 }
-path = 'results/TD3_save-01.07.2025_16.13.26'
-model_type = 'best'
-n_runs = 5
+path = 'results/TD3_save-12.30.2024_13.54.04'
+model_type = 'best' #final or best
+n_runs = 100 #amount of times to test the model
 runs = Multiple_runs(n_runs, parameters, path, model_type)
 test = runs.all_runs()
-
-for arr in test:
-    if arr[-1]["terminated"]:
-        endpoint = [arr[-1]["obs"][0],arr[-1]["obs"][1]]
-        print(endpoint)
-
-"""
-print(test)
-print(len(test))
-print(sum(d["reward"] for d in data))
-
-total_reward = 0
-
-for ep in test:
-    reward = sum(d["reward"] for d in ep)
-    print(reward)
-    total_reward += reward
-
-
-avg_rew = total_reward/len(test)
-print(avg_rew)
-"""

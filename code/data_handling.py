@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import seaborn as sns
 import os
 import torch
@@ -8,9 +9,9 @@ import csv
 import pickle
 import pandas as pd
 
+from stable_baselines3 import DDPG,TD3,SAC
 
-from stable_baselines3 import TD3
-
+#code making the plots and logging data
 
 class Txt_File:
     def __init__(self,store_path):
@@ -26,9 +27,11 @@ class Txt_File:
             for key, value in par.items():
                 f.write(f"{key}: {value}\n")
 
+#plot for models
 class Plot:
     def __init__(self,file):
         self.file = file
+        self.png = 'recourses/Logo/Liu_logo-transformed.png'
 
         self.plot_path = os.path.join(file, 'plots')
         if not os.path.exists(self.plot_path):
@@ -52,8 +55,7 @@ class Plot:
         action_tensor = torch.tensor(action)
         """
 
-
-        q_values = np.zeros((len(x_range), len(y_range)))
+        values = np.zeros((len(x_range), len(y_range)))
 
         for i, x in enumerate(x_range):
             print(i)
@@ -61,20 +63,35 @@ class Plot:
                 state = self.dictState(x, y)
                 action_predicted = actor(state)
                 with model.policy.device:
-                    q_value = critic(state, action_predicted)[0].item()
-                q_values[i, j] = q_value
+                    value = critic(state, action_predicted)[0].item()
+                values[i, j] = value
 
-        plt.figure(figsize=(8, 6))
-        plt.contourf(x_range, y_range, q_values.T, levels=50, cmap='viridis')
-        plt.colorbar(label="Average Value")
-        plt.xlabel("X (State)")
-        plt.ylabel("Y (State)")
-        plt.title("Average Value Contour Map")
+        fig, ax = plt.subplots(figsize=(8, 6))
+        contour = ax.contourf(x_range, y_range, values.T, levels=50, cmap='viridis', zorder=1)
+
+        contour_lines = plt.contour(x_range, y_range, values.T, levels=50, colors='black', linewidths=0.5)
+
+        ax.set_xlabel("X (State)")
+        ax.set_ylabel("Y (State)")
+        ax.set_title("Average Value Contour Map SAC")
+
+        
 
         target_x = 2.5
         target_y = 2
-        plt.scatter(target_x, target_y, color='red', s=50, label="Target")
-        plt.legend()
+        ax.scatter(target_x, target_y, color='green', s=50, label="Target", zorder=10)
+
+        target_x = 4.5
+        target_y = 3.5
+        ax.scatter(target_x, target_y, color='red', s=50, label="Start", zorder=10)
+
+        cbar = plt.colorbar(contour, ax=ax)
+        cbar.set_label('Average Value')
+
+        ax.legend()
+
+        image = plt.imread(self.png)
+        ax.imshow(image, extent=[0, 5, 0, 4], aspect='auto', alpha=0.3, zorder=5) 
 
         plt.savefig(self.plot_path+"/"+model_type+"_average_value_contour.png", dpi=1000)
         plt.show()
@@ -89,18 +106,19 @@ class Plot:
 
         avg_rewards = rewards.mean(axis=1)
 
-        window = 1
-        moving_avg_rewards = np.convolve(avg_rewards, np.ones(window)/window, mode='valid')
+        window = 10
+
+        moving_avg_rewards = np.convolve(avg_rewards, np.ones(window)/window, mode='same')
 
         steps_moving_avg = steps[:len(moving_avg_rewards)]
-
 
         print(np.max(avg_rewards))
 
         plt.figure(figsize=(10, 6))
-        plt.plot(steps_moving_avg, moving_avg_rewards, label="MA Return vs Steps", color="blue")
+        plt.plot(steps, avg_rewards, label="Return", color="blue", alpha=0.4)
+        plt.plot(steps_moving_avg, moving_avg_rewards, label=f"{window} SMA Return ", color="red")
 
-        plt.title("MA Return vs Steps")
+        plt.title("Return vs Steps TD3")
         plt.xlabel("Steps")
         plt.ylabel("Return")
         plt.legend()
@@ -124,7 +142,8 @@ class Plot:
             }
         
         return ret
-    
+
+#log for single episode
 class Logger_obs():
     def __init__(self,store_path):
         self.store_path = store_path
@@ -140,7 +159,7 @@ class Logger_obs():
             obs["rpy"][0][0], obs["rpy"][0][1], obs["rpy"][0][2],                # Roll, Pitch, Yaw
             obs["ang_v"][0][0], obs["ang_v"][0][1], obs["ang_v"][0][2]          # Angular velocity (x, y, z)
         ]
-        self.all_obs.append(flattened_obs)  # Append the observation to the log
+        self.all_obs.append(flattened_obs)
 
     def save_obs(self):
         headers = [
@@ -150,15 +169,16 @@ class Logger_obs():
             "AngularVelocity_x", "AngularVelocity_y", "AngularVelocity_z"
         ]
         
-        # Write the collected data to a CSV file
         with open(self.file_path, mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(headers)  # Write the header row
-            writer.writerows(self.all_obs)  # Write all the collected data
+            writer.writerow(headers)
+            writer.writerows(self.all_obs)
             print("observation written to file "+ self.file_path)
 
+#plot for single episode
 class Plot_obs():
     def __init__(self,file):
+        self.png = 'recourses/Logo/Liu_logo-transformed.png'
         self.file = file
         self.all_obs = np.loadtxt(self.file,delimiter=',', skiprows=1)
 
@@ -213,26 +233,30 @@ class Plot_obs():
         x_pos = [obs[0] for obs in self.all_obs]
         y_pos = [obs[1] for obs in self.all_obs]
 
-        # Create the plot
-        plt.figure(figsize=(8, 5))
-        plt.plot(x_pos, y_pos, linestyle='-', color='blue', label= 'position')
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        image = plt.imread(self.png)
+        ax.imshow(image, extent=[0, 5, 0, 4], aspect='auto', alpha=0.3, zorder = 1)
+
+        ax.plot(x_pos, y_pos, linestyle='-', color='blue', label= 'position', zorder = 10)
 
         # Add labels and title
-        plt.xlabel('x(m)')
-        plt.ylabel('y(m)')
-        plt.title('Drone path')
+        ax.set_xlabel('x(m)')
+        ax.set_ylabel('y(m)')
+        ax.set_title('Drone path')
         plt.legend()
         plt.grid(True)
 
         # Show the plot
         plt.show()
 
-    # Function to get the corresponding column index
     def get_column_index(self,name):
         return self.column_indices.get(name, "Invalid name")
-    
+
+#plot for mulitple episodes   
 class Plot_muliple_runs():
     def __init__(self,file1, file2 = None, file3 = None):
+        self.png = 'recourses/Logo/Liu_logo-transformed.png'
         self.target = np.array([2.5,2])
 
         self.file1 = file1
@@ -290,19 +314,22 @@ class Plot_muliple_runs():
         return shortest_array
     
     def plot_xy_positions(self):
-        plt.figure(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        image = plt.imread(self.png)
+        ax.imshow(image, extent=[0, 5, 0, 4], aspect='auto', alpha=0.3, zorder = 1)
 
         for arr in self.data_all_runs1:
             pos_x,pos_y = self.x_y_pos_one_run(arr)
-            plt.plot(pos_x, pos_y, linestyle='-', color='red', alpha=0.1)
+            ax.plot(pos_x, pos_y, linestyle='-', color='red', alpha=0.1, zorder = 5)
 
         pos_x,pos_y = self.x_y_pos_one_run(self.best_reward_arr())
-        plt.plot(pos_x, pos_y, linestyle='-', color='green', alpha=0.9, label= "Best reward" )
+        ax.plot(pos_x, pos_y, linestyle='-', color='green', alpha=0.9, label= "Best reward", zorder = 10)
 
         # Add labels and title
-        plt.xlabel('x(m)')
-        plt.ylabel('y(m)')
-        plt.title(f'Path of {self.number_of_runs} runs ')
+        ax.set_xlabel('x(m)')
+        ax.set_ylabel('y(m)')
+        ax.set_title(f'Path of {self.number_of_runs} runs TD3')
         plt.legend()
         plt.grid(True)
 
@@ -326,7 +353,7 @@ class Plot_muliple_runs():
         # Show the plot
         plt.show()
 
-    def plot_boxplot(self):
+    def plot_boxplot_return(self):
         return_ep1 = []
         return_ep2 = []
         return_ep3 = []
@@ -349,7 +376,7 @@ class Plot_muliple_runs():
         plt.figure(figsize=(8, 6))
         sns.boxplot(x="Dataset", y="Values", data=df, palette="pastel")
 
-        plt.title("Boxplot of DDPG,TD3 and SAC", fontsize=14)
+        plt.title("Boxplot of return", fontsize=14)
         plt.xlabel("Algorithm", fontsize=12)
         plt.ylabel("Return", fontsize=12)
 
@@ -375,6 +402,54 @@ class Plot_muliple_runs():
         plt.xlabel('Distance', fontsize=12)
         plt.ylabel('Frequency', fontsize=12)
         plt.title(f'Distribution of distance from target for {self.number_of_runs} runs', fontsize=14)
+
+        # Show the plot
+        plt.show()
+
+    def plot_boxplot_endpoint(self):
+        dis_endpoints_to_target1 = []
+        dis_endpoints_to_target2 = []
+        dis_endpoints_to_target3 = []
+
+        for arr in self.data_all_runs1:
+            if arr[-1]["terminated"]:
+                dis_endpoints_to_target1.append(self.calculate_distotarget(arr[-1]))
+            elif arr[-1]["truncated"]:
+                dis_endpoints_to_target1.append(self.shortes_distotarget(arr))
+            else: 
+                print("error")
+                dis_endpoints_to_target1.append(None)
+
+        for arr in self.data_all_runs2:
+            if arr[-1]["terminated"]:
+                dis_endpoints_to_target2.append(self.calculate_distotarget(arr[-1]))
+            elif arr[-1]["truncated"]:
+                dis_endpoints_to_target2.append(self.shortes_distotarget(arr))
+            else: 
+                print("error")
+                dis_endpoints_to_target2.append(None)
+        
+        for arr in self.data_all_runs3:
+            if arr[-1]["terminated"]:
+                dis_endpoints_to_target3.append(self.calculate_distotarget(arr[-1]))
+            elif arr[-1]["truncated"]:
+                dis_endpoints_to_target3.append(self.shortes_distotarget(arr))
+            else: 
+                print("error")
+                dis_endpoints_to_target3.append(None)
+
+        data = {
+            "Dataset": ["DDPG"] * len(dis_endpoints_to_target1) + ["TD3"] * len(dis_endpoints_to_target2) + ["SAC"] * len(dis_endpoints_to_target3),
+            "Values": dis_endpoints_to_target1 + dis_endpoints_to_target2 + dis_endpoints_to_target3,
+        }
+        df = pd.DataFrame(data)
+
+        plt.figure(figsize=(8, 6))
+        sns.boxplot(x="Dataset", y="Values", data=df, palette="pastel")
+
+        plt.title("Boxplot of distance to the target", fontsize=14)
+        plt.xlabel("Algorithm", fontsize=12)
+        plt.ylabel("Distance to target", fontsize=12)
 
         # Show the plot
         plt.show()

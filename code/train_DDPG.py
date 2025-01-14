@@ -49,10 +49,12 @@ class Train_DDPG():
         n_actions = train_env.action_space.shape
         action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=1/3 * np.ones(n_actions))
 
-
+        #for training from an older model
         """
         model = DDPG.load("results/DDPG_save-12.08.2024_23.19.52/final_model.zip",train_env)
         """
+
+        #for training from new model
         model = DDPG('MultiInputPolicy',train_env,
                     learning_rate=self.parameters['Learning_rate'],
                     learning_starts=self.parameters['learning_starts'],
