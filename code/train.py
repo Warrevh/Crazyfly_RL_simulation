@@ -25,7 +25,7 @@ parameters = {
     'Rew_step_fact': 0, #factor for negative reward of each step
     'Rew_direct_fact': 100, #factor for direction of travel (posetive of in direction of target)
     'Rew_angvel_fact': 5, #factor for changes in angular velocity (negative)
-    'Rew_collision': -150, #reward for colliding into wall
+    'Rew_collision': -100, #reward for colliding into wall
     'Rew_terminated': 1000, #reward if the goal is reached
     #evaluation callback
     'eval_freq': 1, #"episodes" (eval_freq*(epsiode_length*ctrl_freq)) how often the agent is evaluated (in episodes)
