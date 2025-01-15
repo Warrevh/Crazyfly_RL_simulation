@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from data_handling import Plot,Plot_obs,Plot_muliple_runs
 
 #used for visualising data
-
+"""
 ####
 #plot for RL model
 model_filepath = "results/SAC_save-01.15.2025_00.49.25"
@@ -17,13 +17,25 @@ plot.VisValue('final')
 """
 ####
 #plot for observations of single episode
-obs_file = 'results/SAC_save-12.21.2024_08.16.17/obs_log_sim_12.22.2024_15.29.31.txt'#'results/trained_SAC_save-12.16.2024_01.10.16/obs_log_sim_12.16.2024_15.00.56.txt'#'test_data/obs_log_filterd_2024-12-16 21:51:14.txt'
+obs_file = 'test_data/obs_log_filterd_2025-01-15 15:43:09.txt'#'results/trained_SAC_save-12.16.2024_01.10.16/obs_log_sim_12.16.2024_15.00.56.txt'#'test_data/obs_log_filterd_2024-12-16 21:51:14.txt'
+obs_files = ['test_data/obs_log_filterd_2025-01-15 15:55:52.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:53:25.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:52:33.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:51:50.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:50:55.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:49:50.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:49:05.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:48:22.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:47:09.txt',
+             'test_data/obs_log_filterd_2025-01-15 15:43:09.txt'
+             ]
 plot_obs = Plot_obs(obs_file)
 #plot_obs.plot_single_value('Roll')
-plot_obs.plot_multiple_value(["AngularVelocity_x","AngularVelocity_y","AngularVelocity_z"]) #"AngularVelocity_x","AngularVelocity_y","AngularVelocity_z","Roll","Pitch","Yaw"
+plot_obs.plot_multiple_value(["Velocity_x","Velocity_y"]) #"AngularVelocity_x","AngularVelocity_y","AngularVelocity_z","Roll","Pitch","Yaw"
 plot_obs.plot_xy_position()
+plot_obs.plot_multi_xy_position(obs_files)
 ####
-
+"""
 ####
 #plot for plotting multiple runs
 file1 = "results/TD3_save-12.30.2024_13.54.04/data_100_runs_with_best_model_01.10.2025_14.40.29.pkl"

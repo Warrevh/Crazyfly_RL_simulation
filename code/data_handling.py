@@ -222,7 +222,7 @@ class Plot_obs():
 
         plt.xlabel('Steps')
         plt.ylabel('m')
-        plt.title('Position vs. Steps')
+        plt.title('Velocity with noise')
         plt.legend()
         plt.grid(True)
 
@@ -245,6 +245,28 @@ class Plot_obs():
         ax.set_ylabel('y(m)')
         ax.set_title('Drone path')
         plt.legend()
+        plt.grid(True)
+
+        # Show the plot
+        plt.show()
+
+    def plot_multi_xy_position(self,files):
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        image = plt.imread(self.png)
+        ax.imshow(image, extent=[0, 5, 0, 4], aspect='auto', alpha=0.3, zorder = 1)
+
+        for file in files:
+            all_obs = np.loadtxt(file,delimiter=',', skiprows=1)
+            x_pos = [obs[0] for obs in all_obs]
+            y_pos = [obs[1] for obs in all_obs]
+            ax.plot(x_pos, y_pos, linestyle='-', color='red', alpha=0.4, zorder = 5)
+
+        # Add labels and title
+        ax.set_xlabel('x(m)')
+        ax.set_ylabel('y(m)')
+        ax.set_title(f'Drone path of {len(files)} runs')
         plt.grid(True)
 
         # Show the plot

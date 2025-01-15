@@ -61,13 +61,13 @@ test_env = RLEnvironment( parameters=parameters ,gui=True )
 folder = "results/SAC_save-01.15.2025_00.49.25"
 
 #type of model: best or final
-model = SAC.load(str(folder+f"/final_model"))
+model = SAC.load(str(folder+f"/best_model"))
 
 log = Logger_obs(folder)
 
 mean_reward, std_reward = evaluate_policy(model,
                                             test_env,
-                                            n_eval_episodes=1
+                                            n_eval_episodes=10
                                             )
 print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
 
