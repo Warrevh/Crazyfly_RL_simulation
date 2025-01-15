@@ -7,7 +7,7 @@ from data_handling import Plot,Plot_obs,Plot_muliple_runs
 
 ####
 #plot for RL model
-model_filepath = "results/TD3_save-01.13.2025_09.14.07"
+model_filepath = "results/SAC_save-01.15.2025_00.49.25"
 
 plot = Plot(model_filepath)
 plot.PlotReward()

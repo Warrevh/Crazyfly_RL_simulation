@@ -42,7 +42,7 @@ class Plot:
         model_type_ = model_type + '_model.zip'
         filename = os.path.join(self.file, model_type_)
 
-        model = TD3.load(filename)
+        model = SAC.load(filename)
 
         critic = model.policy.critic
         actor = model.policy.actor
