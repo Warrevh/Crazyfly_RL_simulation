@@ -266,7 +266,7 @@ class Plot_obs():
         # Add labels and title
         ax.set_xlabel('x(m)')
         ax.set_ylabel('y(m)')
-        ax.set_title(f'Drone path of {len(files)} runs')
+        ax.set_title(f'Drone path of {len(files)} runs with SAC')
         plt.grid(True)
 
         # Show the plot

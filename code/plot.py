@@ -17,17 +17,17 @@ plot.VisValue('final')
 """
 ####
 #plot for observations of single episode
-obs_file = 'test_data/obs_log_filterd_2025-01-15 15:43:09.txt'#'results/trained_SAC_save-12.16.2024_01.10.16/obs_log_sim_12.16.2024_15.00.56.txt'#'test_data/obs_log_filterd_2024-12-16 21:51:14.txt'
-obs_files = ['test_data/obs_log_filterd_2025-01-15 15:55:52.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:53:25.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:52:33.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:51:50.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:50:55.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:49:50.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:49:05.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:48:22.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:47:09.txt',
-             'test_data/obs_log_filterd_2025-01-15 15:43:09.txt'
+obs_file = 'implementation_test_data/obs_log_filterd_2025-01-15 15:43:09.txt'#'results/trained_SAC_save-12.16.2024_01.10.16/obs_log_sim_12.16.2024_15.00.56.txt'#'implementation_test_data/obs_log_filterd_2024-12-16 21:51:14.txt'
+obs_files = ['implementation_test_data/obs_log_filterd_2025-01-15 15:55:52.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:53:25.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:52:33.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:51:50.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:50:55.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:49:50.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:49:05.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:48:22.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:47:09.txt',
+             'implementation_test_data/obs_log_filterd_2025-01-15 15:43:09.txt'
              ]
 plot_obs = Plot_obs(obs_file)
 #plot_obs.plot_single_value('Roll')
