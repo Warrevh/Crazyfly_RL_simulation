@@ -48,10 +48,10 @@ parameters = {
 
 #which algorithm to train
 
-#DDPG = Train_DDPG(parameters=parameters,train_gui=False)
-TD3 = Train_TD3(parameters=parameters,train_gui=False)
+DDPG = Train_DDPG(parameters=parameters,train_gui=False)
+#TD3 = Train_TD3(parameters=parameters,train_gui=False)
 #SAC = Train_SAC(parameters=parameters,train_gui=False)
 
-#DDPG.train_DDPG()
-TD3.train_TD3()
+DDPG.train_DDPG()
+#TD3.train_TD3()
 #SAC.train_SAC()

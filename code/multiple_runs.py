@@ -1,4 +1,4 @@
-from stable_baselines3 import TD3
+from stable_baselines3 import TD3,DDPG,SAC
 import numpy as np
 import pickle
 from datetime import datetime
@@ -89,7 +89,7 @@ parameters = {
     'Rew_step_fact': 0, #factor for negative reward of each step
     'Rew_direct_fact': 100, #factor for direction of travel (posetive of in direction of target)
     'Rew_angvel_fact': 5, #factor for changes in angular velocity (negative)
-    'Rew_collision': -100, #reward for colliding into wall
+    'Rew_collision': -200, #reward for colliding into wall
     'Rew_terminated': 1000, #reward if the goal is reached
     #evaluation callback
     'eval_freq': 1, #"episodes" (eval_freq*(epsiode_length*ctrl_freq)) how often the agent is evaluated (in episodes)
@@ -109,7 +109,8 @@ parameters = {
     'Reward_Function': '(-self.Rew_distrav_fact*(np.linalg.norm(self.reward_state[0:2]-prev_state[0:2]))+self.Rew_disway_fact*max(0,2-np.linalg.norm(self.TARGET_POS[0:2]-self.reward_state[0:2])**4)-self.Rew_step_fact*1 +self.Rew_tardis_fact*(prev_tar_dis-self.target_dis)-self.Rew_angvel_fact*(np.sum((self.angvel-prev_angvel)**2)))',
     'parent_model': "none"
 }
-path = 'results/SAC_save-01.15.2025_00.49.25'
+
+path = 'results/TD3'
 model_type = 'best' #final or best
 n_runs = 100 #amount of times to test the model
 runs = Multiple_runs(n_runs, parameters, path, model_type)

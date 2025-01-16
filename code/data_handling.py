@@ -118,7 +118,7 @@ class Plot:
         plt.plot(steps, avg_rewards, label="Return", color="blue", alpha=0.4)
         plt.plot(steps_moving_avg, moving_avg_rewards, label=f"{window} SMA Return ", color="red")
 
-        plt.title("Return vs Steps TD3")
+        plt.title("Return vs Steps SAC")
         plt.xlabel("Steps")
         plt.ylabel("Return")
         plt.legend()
@@ -277,13 +277,14 @@ class Plot_obs():
 
 #plot for mulitple episodes   
 class Plot_muliple_runs():
-    def __init__(self,file1, file2 = None, file3 = None):
+    def __init__(self,file1, file2 = None, file3 = None, file4 = None):
         self.png = 'recourses/Logo/Liu_logo-transformed.png'
         self.target = np.array([2.5,2])
 
         self.file1 = file1
         self.file2 = file2
         self.file3 = file3
+        self.file4 = file4
 
         with open(self.file1, 'rb') as f:
             self.data_all_runs1 = pickle.load(f)
@@ -293,6 +294,9 @@ class Plot_muliple_runs():
 
         with open(self.file3, 'rb') as f:
             self.data_all_runs3 = pickle.load(f)
+
+        with open(self.file4, 'rb') as f:
+            self.data_all_runs4 = pickle.load(f)
 
         
 
@@ -351,7 +355,7 @@ class Plot_muliple_runs():
         # Add labels and title
         ax.set_xlabel('x(m)')
         ax.set_ylabel('y(m)')
-        ax.set_title(f'Path of {self.number_of_runs} runs TD3')
+        ax.set_title(f'Path of {self.number_of_runs} runs DDPG')
         plt.legend()
         plt.grid(True)
 
@@ -379,6 +383,7 @@ class Plot_muliple_runs():
         return_ep1 = []
         return_ep2 = []
         return_ep3 = []
+        return_ep4 = []
 
         for arr in self.data_all_runs1:
             return_ep1.append(sum(d["reward"] for d in arr))
@@ -389,9 +394,12 @@ class Plot_muliple_runs():
         for arr in self.data_all_runs3:
             return_ep3.append(sum(d["reward"] for d in arr))
 
+        for arr in self.data_all_runs4:
+            return_ep4.append(sum(d["reward"] for d in arr))
+
         data = {
-            "Dataset": ["DDPG"] * len(return_ep1) + ["TD3"] * len(return_ep2) + ["SAC"] * len(return_ep3),
-            "Values": return_ep1 + return_ep2 + return_ep3,
+            "Dataset": ["DDPG"] * len(return_ep1) + ["TD3"] * len(return_ep2) + ["TD3 with -200"] * len(return_ep4) + ["SAC"] * len(return_ep3),
+            "Values": return_ep1 + return_ep2 + return_ep4 + return_ep3,
         }
         df = pd.DataFrame(data)
 
@@ -432,6 +440,7 @@ class Plot_muliple_runs():
         dis_endpoints_to_target1 = []
         dis_endpoints_to_target2 = []
         dis_endpoints_to_target3 = []
+        dis_endpoints_to_target4 = []
 
         for arr in self.data_all_runs1:
             if arr[-1]["terminated"]:
@@ -460,9 +469,18 @@ class Plot_muliple_runs():
                 print("error")
                 dis_endpoints_to_target3.append(None)
 
+        for arr in self.data_all_runs4:
+            if arr[-1]["terminated"]:
+                dis_endpoints_to_target4.append(self.calculate_distotarget(arr[-1]))
+            elif arr[-1]["truncated"]:
+                dis_endpoints_to_target4.append(self.shortes_distotarget(arr))
+            else: 
+                print("error")
+                dis_endpoints_to_target4.append(None)
+
         data = {
-            "Dataset": ["DDPG"] * len(dis_endpoints_to_target1) + ["TD3"] * len(dis_endpoints_to_target2) + ["SAC"] * len(dis_endpoints_to_target3),
-            "Values": dis_endpoints_to_target1 + dis_endpoints_to_target2 + dis_endpoints_to_target3,
+            "Dataset": ["DDPG"] * len(dis_endpoints_to_target1) + ["TD3"] * len(dis_endpoints_to_target2) + ["TD3 with -200"] * len(dis_endpoints_to_target4) + ["SAC"] * len(dis_endpoints_to_target3),
+            "Values": dis_endpoints_to_target1 + dis_endpoints_to_target2 + dis_endpoints_to_target4 + dis_endpoints_to_target3,
         }
         df = pd.DataFrame(data)
 

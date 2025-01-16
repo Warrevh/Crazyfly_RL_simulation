@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 from data_handling import Plot,Plot_obs,Plot_muliple_runs
 
 #used for visualising data
-"""
+
 ####
 #plot for RL model
-model_filepath = "results/SAC_save-01.15.2025_00.49.25"
+model_filepath = "results/SAC"
 
 plot = Plot(model_filepath)
 plot.PlotReward()
-plot.VisValue('final')
+plot.VisValue('best')
 
 ####
 """
@@ -35,14 +35,15 @@ plot_obs.plot_multiple_value(["Velocity_x","Velocity_y"]) #"AngularVelocity_x","
 plot_obs.plot_xy_position()
 plot_obs.plot_multi_xy_position(obs_files)
 ####
-"""
+
 ####
 #plot for plotting multiple runs
-file1 = "results/TD3_save-12.30.2024_13.54.04/data_100_runs_with_best_model_01.10.2025_14.40.29.pkl"
-file2 = "results/SAC_save-01.02.2025_22.55.34/data_100_runs_with_best_model_01.10.2025_14.27.55.pkl"
-file3 = "results/TD3_save-12.30.2024_13.54.04/data_100_runs_with_best_model_01.10.2025_14.40.29.pkl"
+file1 = "results/DDPG/data_100_runs_with_best_model_01.16.2025_22.01.57.pkl"
+file2 = "results/TD3/data_100_runs_with_best_model_01.16.2025_21.26.24.pkl"
+file3 = "results/SAC/data_100_runs_with_best_model_01.16.2025_22.33.40.pkl"
+file4 = "results/TD3_with_200/data_100_runs_with_best_model_01.16.2025_22.39.14.pkl"
 
-plot_multiple = Plot_muliple_runs(file1,file2,file3)
+plot_multiple = Plot_muliple_runs(file1,file2,file3,file4)
 plot_multiple.plot_xy_positions()
 #plot_multiple.plot_distribution_return()
 #plot_multiple.plot_distribution_endpoint()
